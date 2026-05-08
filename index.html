@@ -7,281 +7,1166 @@
 <script src="https://cdn.jsdelivr.net/npm/qz-tray/qz-tray.js"></script>
 
 <style>
-body { font-family: Arial; margin:0; background:#f4f6f8; display:flex; }
-.coluna { width:50%; padding:15px; }
-.caixa { background:white; padding:15px; border-radius:10px; }
 
-.grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+body{
+    font-family:Arial, sans-serif;
+    margin:0;
+    background:#f5f5f7;
 
-.box {
-    background:#fff;
-    padding:8px;
+    display:flex;
+    align-items:flex-start;
+    gap:15px;
+
+    width:100%;
+}
+
+/* COLUNAS */
+.coluna{
+    flex:1;
+    padding:15px;
+    box-sizing:border-box;
+    min-width:0;
+}
+
+.caixa{
+    background:white;
+    padding:18px;
+    border-radius:18px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.08);
+}
+
+/* INPUT */
+input[type=text]{
+    padding:10px;
     border-radius:8px;
+    border:1px solid #ccc;
+}
+
+/* GRID */
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    align-items:start;
+}
+
+/* BOXES */
+.box{
+    background:#fff;
+    padding:10px;
+    border-radius:10px;
     border:1px solid #ddd;
 }
 
-.box b { display:block; margin-bottom:6px; }
+.acoes{
+    margin-top:15px;
+}
 
-.box label {
+.box b{
     display:block;
-    margin-bottom:4px;
+    margin-bottom:8px;
+}
+
+.box label{
+    display:block;
+    margin-bottom:5px;
     cursor:pointer;
 }
 
-.pedido { border-radius:10px; padding:10px; margin-bottom:10px; }
-.preparo { background:#fff3cd; }
-.pronto { background:#d4edda; }
-
-button {
+/* BOTÕES */
+button{
     width:100%;
-    padding:8px;
-    margin-top:5px;
+    padding:10px;
+    margin-top:6px;
     border:none;
-    border-radius:6px;
+    border-radius:8px;
     cursor:pointer;
+    transition:0.2s;
+    font-weight:bold;
 }
 
-.btn { background:#4CAF50; color:white; }
-.btn-sec { background:#ccc; }
-
-.header { font-weight:bold; cursor:pointer; padding:5px; }
-
-.status-ok { opacity:0.6; font-weight:bold; }
-
-.excluir { background:#dc3545; color:white; }
-
-.novo { animation:piscar 1s ease 3; }
-
-@keyframes piscar {
-    0% { background:#fff3cd; }
-    50% { background:#ffeeba; }
-    100% { background:#fff3cd; }
+button:hover{
+    opacity:0.9;
+    transform:scale(1.01);
 }
+
+.btn{
+    background:#4CAF50;
+    color:white;
+}
+
+.btn-sec{
+    background:#ccc;
+}
+
+.excluir{
+    background:#dc3545;
+    color:white;
+}
+
+/* PEDIDOS */
+.pedido{
+    border-radius:16px;
+    margin-bottom:14px;
+    overflow:hidden;
+    transition:0.25s;
+    box-shadow:0 3px 10px rgba(0,0,0,0.08);
+    border:1px solid rgba(0,0,0,0.04);
+}
+
+.preparo{
+    background:#fff3cd;
+    border-left:6px solid #ffc107;
+}
+
+.finalizado{
+    background:#d4edda;
+    border-left:6px solid #28a745;
+}
+
+.entrega{
+    background:#dbeafe;
+    border-left:6px solid #0d6efd;
+}
+
+.recebido{
+    background:#fff3cd;
+    border-left:6px solid #ffc107;
+}
+
+.preparo{
+    background:#ffe5b4;
+    border-left:6px solid #fd7e14;
+}
+
+.pedido:hover{
+    transform:translateY(-2px);
+    box-shadow:0 4px 12px rgba(0,0,0,0.12);
+}
+
+/* HEADER */
+.header{
+    font-weight:bold;
+    cursor:pointer;
+    padding:14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    user-select:none;
+    transition:0.2s;
+    font-size:15px;
+}
+
+.header:hover{
+    background:rgba(0,0,0,0.04);
+}
+
+/* SETA */
+.seta{
+    transition:transform 0.3s ease;
+    font-size:14px;
+}
+
+.seta.aberta{
+    transform:rotate(90deg);
+}
+
+/* DETALHES */
+.detalhe{
+    padding:0 12px;
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+
+    transition:
+        max-height 0.35s ease,
+        opacity 0.25s ease,
+        padding 0.25s ease;
+}
+
+.detalhe.aberto{
+    padding:12px;
+    max-height:500px;
+    opacity:1;
+}
+
+/* STATUS */
+.status-ok{
+    opacity:0.7;
+    font-weight:bold;
+    margin-top:5px;
+}
+
+/* ANIMAÇÃO NOVO PEDIDO */
+.novo{
+    animation:novoPedido 1s ease;
+}
+
+@keyframes novoPedido{
+
+    0%{
+        transform:scale(0.95);
+        opacity:0;
+    }
+
+    60%{
+        transform:scale(1.02);
+    }
+
+    100%{
+        transform:scale(1);
+        opacity:1;
+    }
+
+}
+
+*{
+    box-sizing:border-box;
+}
+
 </style>
 </head>
 
 <body>
 
+<!-- SOM -->
 <audio id="som" preload="auto">
 <source src="som.mp3" type="audio/mpeg">
 </audio>
 
 <!-- CAIXA -->
 <div class="coluna">
+
 <div class="caixa">
 
 <h2>CAIXA</h2>
 
-<input id="cliente" placeholder="Nome do cliente" style="width:100%"><br><br>
+<input id="cliente"
+       placeholder="Nome do cliente"
+       style="width:100%;">
 
+<br><br>
+
+<!-- TAMANHOS -->
 <b>Tamanho</b>
-<label><input type="radio" name="tamanho" value="330ml|14" checked> 🥤 330ml</label>
-<label><input type="radio" name="tamanho" value="550ml|18"> 🥤 550ml</label>
-<label><input type="radio" name="tamanho" value="770ml|25"> 🥤 770ml</label>
+
+<label>
+<input type="radio"
+       name="tamanho"
+       value="330ml|14"
+       checked>
+
+🥤 330ml
+</label>
+
+<label>
+<input type="radio"
+       name="tamanho"
+       value="550ml|18">
+
+🥤 550ml
+</label>
+
+<label>
+<input type="radio"
+       name="tamanho"
+       value="770ml|25">
+
+🥤 770ml
+</label>
 
 <br>
 
+<!-- SUCOS -->
 <div class="box">
-<b>🥤 Sucos de Açaí</b>
-<label><input type="radio" name="suco" value="" checked> Nenhum</label>
-<label><input type="radio" name="suco" value="Açaí com Morango|10"> Açaí com Morango (R$10)</label>
-<label><input type="radio" name="suco" value="Açaí com Maracujá|10"> Açaí com Maracujá (R$10)</label>
-<label><input type="radio" name="suco" value="Açaí com Banana|10"> Açaí com Banana (R$10)</label>
-<label><input type="radio" name="suco" value="Açaí Napolitano|10"> Açaí Napolitano (R$10)</label>
-<label><input type="radio" name="suco" value="Açaí com Nutella|15"> Açaí com Nutella (R$15)</label>
-<label><input type="radio" name="suco" value="Açaí com Leite em Pó e Leite Condensado|12">
-Açaí com Leite em Pó e Leite Condensado (R$12)</label>
+
+<div class="header"
+     onclick="toggleSucos()">
+
+    <span>🥤 Sucos de Açaí</span>
+
+    <span id="seta-suco"
+          class="seta">
+
+        ▶
+
+    </span>
+
 </div>
 
+<div id="areaSucos"
+     class="detalhe">
+
+    <label>
+    <input type="radio"
+           name="suco"
+           value=""
+           checked>
+
+    Nenhum
+    </label>
+
+    <label>
+    <input type="radio"
+           name="suco"
+           value="Açaí com Morango|10">
+
+    Açaí com Morango (R$10)
+    </label>
+
+    <label>
+    <input type="radio"
+           name="suco"
+           value="Açaí com Maracujá|10">
+
+    Açaí com Maracujá (R$10)
+    </label>
+
+    <label>
+    <input type="radio"
+           name="suco"
+           value="Açaí com Banana|10">
+
+    Açaí com Banana (R$10)
+    </label>
+
+    <label>
+    <input type="radio"
+           name="suco"
+           value="Açaí Napolitano|10">
+
+    Açaí Napolitano (R$10)
+    </label>
+
+    <label>
+    <input type="radio"
+           name="suco"
+           value="Açaí com Nutella|15">
+
+    Açaí com Nutella (R$15)
+    </label>
+
+    <label>
+    <input type="radio"
+           name="suco"
+           value="Açaí com Leite em Pó e Leite Condensado|12">
+
+    Leite em Pó + Condensado (R$12)
+    </label>
+
+</div>
+
+</div>
+
+<br>
+
+<!-- GRID -->
 <div class="grid">
 
+<!-- COMPLEMENTOS -->
 <div class="box">
+
 <b>🥣 Complementos</b>
+
 <label><input type="checkbox" value="Leite Condensado"> Leite Condensado</label>
 <label><input type="checkbox" value="Leite em Pó"> Leite em Pó</label>
 <label><input type="checkbox" value="Sucrilhos"> Sucrilhos</label>
 <label><input type="checkbox" value="Granola"> Granola</label>
 <label><input type="checkbox" value="Paçoca"> Paçoca</label>
+
 </div>
 
+<!-- FRUTAS -->
 <div class="box">
+
 <b>🍓 Frutas</b>
+
 <label><input type="checkbox" value="Morango"> Morango</label>
 <label><input type="checkbox" value="Uva"> Uva</label>
 <label><input type="checkbox" value="Banana"> Banana</label>
+
 </div>
 
+<!-- ADICIONAIS -->
 <div class="box">
-<b>🍫 Adicionais</b>
-<label><input type="checkbox" value="Nutella|5"> Nutella (+R$5)</label>
-<label><input type="checkbox" value="Ovomaltine|3"> Ovomaltine (+R$3)</label>
-<label><input type="checkbox" value="Confete de chocolate|3"> Confete (+R$3)</label>
-</div>
+
+<div class="header"
+     onclick="toggleAdicionais()">
+
+    <span>🍫 Adicionais</span>
+
+    <span id="seta-adicionais"
+          class="seta">
+
+        ▶
+
+    </span>
 
 </div>
 
-<button class="btn" onclick="criarPedido()">CRIAR PEDIDO</button>
-<button class="btn-sec" onclick="novoPedido()">LIMPAR</button>
+<div id="areaAdicionais"
+     class="detalhe">
+
+    <label>
+    <input type="checkbox"
+           value="Nutella|5">
+
+    Nutella (+R$5)
+    </label>
+
+    <label>
+    <input type="checkbox"
+           value="Ovomaltine|3">
+
+    Ovomaltine (+R$3)
+    </label>
+
+    <label>
+    <input type="checkbox"
+           value="Confete de chocolate|3">
+
+    Confete (+R$3)
+    </label>
+
+</div>
+
+</div>
+
+<!-- BOTÕES -->
+<div class="acoes">
+
+<button class="btn"
+        onclick="criarPedido()">
+
+CRIAR PEDIDO
+
+</button>
+
+<button class="btn-sec"
+        onclick="novoPedido()">
+
+LIMPAR
+
+</button>
+
+</div>
 
 <hr>
-<h3>Total do Dia: R$ <span id="totalDia">0</span></h3>
+
+<h3>
+Total do Dia:
+R$ <span id="totalDia">0.00</span>
+</h3>
 
 </div>
 </div>
 
 <!-- PRODUÇÃO -->
 <div class="coluna">
+
 <h2>PRODUÇÃO</h2>
 
 <div style="display:flex; gap:10px;">
+
+<!-- PREPARO -->
 <div style="width:50%;">
+
 <h3>🟡 Em preparo</h3>
+
 <div id="colPreparo"></div>
+
 </div>
 
+<!-- PRONTOS -->
 <div style="width:50%;">
+
 <h3>🟢 Prontos</h3>
+
 <div id="colPronto"></div>
-</div>
+
 </div>
 
+</div>
 </div>
 
 <script>
-let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-let contador = pedidos.length + 1;
 
-function salvar() {
-    localStorage.setItem("pedidos", JSON.stringify(pedidos));
+let pedidos =
+    JSON.parse(localStorage.getItem("pedidos"))
+    || [];
+
+let contador =
+    pedidos.length + 1;
+
+/* SALVAR */
+function salvar(){
+
+    localStorage.setItem(
+        "pedidos",
+        JSON.stringify(pedidos)
+    );
+
 }
 
-function novoPedido() {
+function tempoDecorrido(pedido){
+
+    if(!pedido.data) return "00:00";
+
+    // PARA O TEMPO
+    if(
+        pedido.status === "entrega" ||
+        pedido.status === "finalizado"
+    ){
+
+        if(pedido.tempoFinal){
+
+            return pedido.tempoFinal;
+
+        }
+
+    }
+
+    let agora = new Date();
+
+    let criado =
+        new Date(pedido.data);
+
+    let diff =
+        Math.floor(
+            (agora - criado) / 1000
+        );
+
+    let minutos =
+        Math.floor(diff / 60);
+
+    let segundos =
+        diff % 60;
+
+    return `${String(minutos).padStart(2,"0")}:${String(segundos).padStart(2,"0")}`;
+
+}
+
+/* LIMPAR */
+function novoPedido(){
+
     document.getElementById("cliente").value = "";
-    document.querySelectorAll("input[type=checkbox]").forEach(c => c.checked = false);
-    document.querySelectorAll('input[name="suco"]').forEach(r => r.checked = false);
-    document.querySelector('input[name="suco"][value=""]').checked = true;
+
+    document.querySelectorAll(
+        "input[type=checkbox]"
+    ).forEach(c => c.checked = false);
+
+    document.querySelectorAll(
+        'input[name="suco"]'
+    ).forEach(r => r.checked = false);
+
+    document.querySelector(
+        'input[name="suco"][value=""]'
+    ).checked = true;
+
 }
 
-function tocarSom() {
-    let som = document.getElementById("som");
+/* SOM */
+function tocarSom(){
+
+    let som =
+        document.getElementById("som");
+
+    som.pause();
     som.currentTime = 0;
+
     som.play().catch(()=>{});
+
 }
 
+/* LIBERA SOM */
 document.addEventListener("click", () => {
-    let som = document.getElementById("som");
-    som.play().then(()=>{ som.pause(); som.currentTime=0; }).catch(()=>{});
+
+    let som =
+        document.getElementById("som");
+
+    som.play()
+    .then(() => {
+
+        som.pause();
+        som.currentTime = 0;
+
+    })
+    .catch(()=>{});
+
 }, { once:true });
 
-async function conectarQZ() {
-    if (!qz.websocket.isActive()) {
+/* QZ */
+async function conectarQZ(){
+
+    if(!qz.websocket.isActive()){
+
         await qz.websocket.connect();
+
     }
+
 }
 
-async function imprimir(p) {
+/* IMPRIMIR */
+async function imprimir(p){
+
     await conectarQZ();
 
-    let texto = "PEDIDO #" + p.numero + "\n\n" +
-                "Cliente: " + p.cliente + "\n\n" +
-                p.itens + "\n" +
-                "TOTAL: R$ " + p.total.toFixed(2) + "\n\n\n";
+    let texto =
 
-    let printer = await qz.printers.getDefault();
-    let config = qz.configs.create(printer);
+        "\x1B\x61\x01" +
 
-    await qz.print(config, [{
-        type: 'raw',
-        format: 'plain',
-        data: texto + '\x1D\x56\x00'
+        "MENALMEI GOURMET\n" +
+
+        "==============================\n" +
+
+        "\x1B\x21\x30" +
+
+        "PEDIDO #" + p.numero + "\n" +
+
+        "\x1B\x21\x00" +
+
+        "==============================\n\n" +
+
+        "\x1B\x61\x00" +
+
+        "Cliente: " + p.cliente + "\n" +
+
+        "Data: " +
+        new Date().toLocaleString() +
+        "\n\n" +
+
+        p.itens + "\n" +
+
+        "------------------------------\n" +
+
+        "TOTAL: R$ " +
+        p.total.toFixed(2) +
+        "\n\n" +
+
+        "Status: " + p.status + "\n\n" +
+
+        "Obrigado pela preferência!\n\n\n";
+
+    let printer =
+        await qz.printers.getDefault();
+
+    let config =
+        qz.configs.create(printer);
+
+    await qz.print(config,[{
+        type:'raw',
+        format:'plain',
+        data:texto + '\x1D\x56\x00'
     }]);
+
 }
 
-function criarPedido() {
-    let cliente = document.getElementById("cliente").value;
+/* REIMPRIMIR */
+function imprimirPedido(numero){
+
+    let pedido =
+        pedidos.find(
+            p => p.numero === numero
+        );
+
+    if(pedido){
+
+        imprimir(pedido);
+
+    }
+
+}
+
+/* CRIAR PEDIDO */
+function criarPedido(){
+
+    let cliente =
+        document.getElementById("cliente").value;
+
     let itensTxt = "";
     let total = 0;
 
-    let sucoSel = document.querySelector('input[name="suco"]:checked');
+    let sucoSel =
+        document.querySelector(
+            'input[name="suco"]:checked'
+        );
 
-    if (sucoSel && sucoSel.value !== "") {
-        let [nome, preco] = sucoSel.value.split("|");
-        itensTxt += "SUCO: " + nome + "\n";
-        total += parseFloat(preco);
-    } else {
-        let [tam, preco] = document.querySelector('input[name="tamanho"]:checked').value.split("|");
-        itensTxt += "Açaí " + tam + "\n";
+    if(
+        sucoSel &&
+        sucoSel.value !== ""
+    ){
+
+        let [nome,preco] =
+            sucoSel.value.split("|");
+
+        itensTxt +=
+            "SUCO: " + nome + "\n";
+
         total += parseFloat(preco);
 
-        document.querySelectorAll("input[type=checkbox]:checked").forEach(c => {
-            if (c.value.includes("|")) {
-                let [nome, valor] = c.value.split("|");
-                itensTxt += "- " + nome + "\n";
-                total += parseFloat(valor);
-            } else {
-                itensTxt += "- " + c.value + "\n";
+    }else{
+
+        let [tam,preco] =
+            document.querySelector(
+                'input[name="tamanho"]:checked'
+            ).value.split("|");
+
+        itensTxt +=
+            "Açaí " + tam + "\n";
+
+        total += parseFloat(preco);
+
+        document.querySelectorAll(
+            "input[type=checkbox]:checked"
+        ).forEach(c => {
+
+            if(c.value.includes("|")){
+
+                let [nome,valor] =
+                    c.value.split("|");
+
+                itensTxt +=
+                    "- " + nome + "\n";
+
+                total +=
+                    parseFloat(valor);
+
+            }else{
+
+                itensTxt +=
+                    "- " + c.value + "\n";
+
             }
+
         });
+
     }
 
     let pedido = {
-        numero: contador++,
-        cliente,
-        itens: itensTxt,
-        total,
-        status: "preparo"
-    };
+
+    numero:contador++,
+    cliente,
+    itens:itensTxt,
+    total,
+
+    data:new Date(),
+
+    status:"recebido"
+
+};
 
     pedidos.push(pedido);
+
     salvar();
+
     atualizarTela();
+
     imprimir(pedido);
+
     tocarSom();
+
     novoPedido();
+
 }
 
-function atualizarTela() {
-    let preparo = "", pronto = "", totalDia = 0;
+/* ATUALIZAR */
+/* ATUALIZAR */
+function atualizarTela(){
+
+    let preparoHTML = "";
+    let prontoHTML = "";
+    let totalDia = 0;
+
+    let ultimoPedido =
+        pedidos.length
+        ? pedidos[pedidos.length - 1].numero
+        : null;
 
     pedidos.forEach(p => {
+
         totalDia += p.total;
 
+        // abre apenas o último pedido que NÃO foi finalizado
+        let aberto = "";
+
+        if (
+            p.numero === ultimoPedido &&
+            p.status !== "finalizado"
+        ){
+            aberto = "aberto";
+        }
+
+        // TEXTO DO STATUS
+        let textoStatus = "";
+
+        if(p.status === "recebido"){
+            textoStatus = "🟡 Recebido";
+        }
+        else if(p.status === "preparo"){
+            textoStatus = "🟠 Em preparo";
+        }
+        else if(p.status === "entrega"){
+            textoStatus = "🔵 Saiu entrega";
+        }
+        else{
+            textoStatus = "🟢 Finalizado";
+        }
+
+        // TEXTO DO BOTÃO
+        let textoBotao = "";
+
+        if(p.status === "recebido"){
+            textoBotao = "🟠 Iniciar preparo";
+        }
+        else if(p.status === "preparo"){
+            textoBotao = "🔵 Saiu entrega";
+        }
+        else if(p.status === "entrega"){
+            textoBotao = "🟢 Finalizar";
+        }
+
         let card = `
-        <div class="pedido ${p.status}">
-            <div class="header">#${p.numero} - ${p.cliente}</div>
-            ${p.itens.replace(/\n/g,"<br>")}
-            <b>R$ ${p.total.toFixed(2)}</b><br>
+        <div class="pedido ${p.status} novo">
 
-            ${p.status==="preparo" ?
-            `<button onclick="mudarStatus(${p.numero})">✔ Pronto</button>` :
-            `<div class="status-ok">✅ Pronto</div>`}
+            <div class="header"
+     onclick="togglePedido(${p.numero})">
 
-            <button onclick="excluirPedido(${p.numero})" class="excluir">🗑 Excluir</button>
-        </div>`;
+    <div style="
+        display:flex;
+        flex-direction:column;
+        gap:3px;
+    ">
 
-        p.status==="preparo" ? preparo+=card : pronto+=card;
+        <span style="
+            font-weight:bold;
+            font-size:15px;
+        ">
+            #${p.numero} - ${p.cliente}
+        </span>
+
+        <span style="
+            font-size:12px;
+            opacity:0.7;
+        ">
+
+            🕒 ${
+                new Date(p.data).toLocaleTimeString(
+                    'pt-BR',
+                    {
+                        hour:'2-digit',
+                        minute:'2-digit'
+                    }
+                )
+            }
+
+            •
+
+            <span id="tempo-header-${p.numero}">
+                ⏱ ${tempoDecorrido(p)}
+            </span>
+
+        </span>
+
+    </div>
+
+    <span id="seta-${p.numero}"
+          class="seta ${aberto}">
+
+        ▶
+
+    </span>
+
+</div>
+
+            <div id="detalhe-${p.numero}"
+                 class="detalhe ${aberto}">
+
+                ${p.itens.replace(/\n/g,"<br>")}
+
+                <br><br>
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                ">
+
+                    <b>
+                    💰 R$ ${p.total.toFixed(2)}
+                    </b>
+
+                    <div id="tempo-${p.numero}" style="
+                        background:${
+                            tempoDecorrido(p).split(':')[0] >= 20
+                            ? '#dc3545'
+                            : tempoDecorrido(p).split(':')[0] >= 10
+                            ? '#ffc107'
+                            : '#28a745'
+                        };
+                        color:white;
+                        padding:4px 8px;
+                        border-radius:20px;
+                        font-size:12px;
+                    ">
+
+                        ⏱ ${tempoDecorrido(p)}
+
+                    </div>
+
+                </div>
+
+                <br>
+
+                <div style="
+                    font-weight:bold;
+                    margin-top:5px;
+                ">
+
+                    ${textoStatus}
+
+                </div>
+
+                <br><br>
+
+                ${
+                    p.status !== "finalizado"
+                    ?
+                    `
+                    <button onclick="mudarStatus(${p.numero})">
+
+                        ${textoBotao}
+
+                    </button>
+                    `
+                    :
+                    `
+                    <div class="status-ok">
+                        ✅ Pedido finalizado
+                    </div>
+                    `
+                }
+
+                <button onclick="imprimirPedido(${p.numero})">
+
+                    🖨 Reimprimir Comanda
+
+                </button>
+
+                <button class="excluir"
+                        onclick="excluirPedido(${p.numero})">
+
+                    🗑 Excluir Pedido
+
+                </button>
+
+            </div>
+
+        </div>
+        `;
+
+        // separação das colunas
+        if(
+            p.status === "recebido" ||
+            p.status === "preparo" ||
+            p.status === "entrega"
+        ){
+            preparoHTML += card;
+        }
+        else{
+            prontoHTML += card;
+        }
+
     });
 
-    colPreparo.innerHTML = preparo;
-    colPronto.innerHTML = pronto;
-    totalDia && (document.getElementById("totalDia").innerText = totalDia.toFixed(2));
+    document.getElementById("colPreparo").innerHTML = preparoHTML;
+
+    document.getElementById("colPronto").innerHTML = prontoHTML;
+
+    document.getElementById("totalDia").innerText =
+        totalDia.toFixed(2);
+
 }
 
-function mudarStatus(n) {
-    let p = pedidos.find(x => x.numero === n);
-    p.status = "pronto";
+function atualizarTempos(){
+
+    pedidos.forEach(p => {
+
+        let tempo =
+            tempoDecorrido(p);
+
+        let minutos =
+            parseInt(
+                tempo.split(":")[0]
+            );
+
+        let cor = "#28a745";
+
+        if(minutos >= 20){
+
+            cor = "#dc3545";
+
+        }
+        else if(minutos >= 10){
+
+            cor = "#ffc107";
+
+        }
+
+        // TEMPO DO CARD ABERTO
+        let tempoEl =
+            document.getElementById(
+                "tempo-" + p.numero
+            );
+
+        if(tempoEl){
+
+            tempoEl.innerHTML =
+                "⏱ " + tempo;
+
+            tempoEl.style.background =
+                cor;
+
+        }
+
+        // TEMPO DO HEADER
+        let tempoHeader =
+            document.getElementById(
+                "tempo-header-" + p.numero
+            );
+
+        if(tempoHeader){
+
+            tempoHeader.innerHTML =
+                "⏱ " + tempo;
+
+        }
+
+    });
+
+}
+
+/* ABRIR / FECHAR */
+function togglePedido(numero){
+
+    let detalhe =
+        document.getElementById(
+            "detalhe-" + numero
+        );
+
+    let seta =
+        document.getElementById(
+            "seta-" + numero
+        );
+
+    if(!detalhe) return;
+
+    detalhe.classList.toggle("aberto");
+
+    if(seta){
+
+        seta.classList.toggle("aberta");
+
+    }
+
+}
+
+function toggleSucos(){
+
+    let area =
+        document.getElementById("areaSucos");
+
+    let seta =
+        document.getElementById("seta-suco");
+
+    area.classList.toggle("aberto");
+
+    seta.classList.toggle("aberta");
+
+}
+
+function toggleAdicionais(){
+
+    let area =
+        document.getElementById("areaAdicionais");
+
+    let seta =
+        document.getElementById("seta-adicionais");
+
+    area.classList.toggle("aberto");
+
+    seta.classList.toggle("aberta");
+
+}
+
+/* STATUS */
+function mudarStatus(numero){
+
+    let pedido =
+        pedidos.find(
+            p => p.numero === numero
+        );
+
+    if(!pedido) return;
+
+    // RECEBIDO -> PREPARO
+    if(pedido.status === "recebido"){
+
+        pedido.status = "preparo";
+
+    }
+
+    // PREPARO -> ENTREGA
+    else if(pedido.status === "preparo"){
+
+        pedido.tempoFinal =
+            tempoDecorrido(pedido);
+
+        pedido.status = "entrega";
+
+    }
+
+    // ENTREGA -> FINALIZADO
+    else if(pedido.status === "entrega"){
+
+        pedido.status = "finalizado";
+
+    }
+
     salvar();
+
     atualizarTela();
+
 }
 
-function excluirPedido(n) {
-    if (!confirm("Excluir pedido?")) return;
-    pedidos = pedidos.filter(p => p.numero !== n);
+/* EXCLUIR */
+function excluirPedido(numero){
+
+    if(
+        !confirm(
+            "Deseja excluir este pedido?"
+        )
+    ) return;
+
+    pedidos =
+        pedidos.filter(
+            p => p.numero !== numero
+        );
+
     salvar();
+
     atualizarTela();
+
 }
 
+/* INICIAR */
 atualizarTela();
+
+setInterval(() => {
+
+    atualizarTempos();
+
+}, 1000);
+
 </script>
 
 </body>
