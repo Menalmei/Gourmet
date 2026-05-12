@@ -2,16 +2,27 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sistema Açaiteria PRO</title>
 
 <script src="https://cdn.jsdelivr.net/npm/qz-tray/qz-tray.js"></script>
 
 <style>
 
+/* GOOGLE FONT */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
 body{
     font-family:Arial, sans-serif;
     margin:0;
-    background:#f5f5f7;
+    background:#f3f4f6;
+    color:#111827;
 
     display:flex;
     align-items:flex-start;
@@ -22,139 +33,295 @@ body{
 
 /* COLUNAS */
 .coluna{
+
     flex:1;
-    padding:15px;
-    box-sizing:border-box;
+
     min-width:0;
+
 }
 
+/* CARD PRINCIPAL */
 .caixa{
     background:white;
     padding:18px;
     border-radius:18px;
     box-shadow:0 4px 15px rgba(0,0,0,0.08);
+
+    color:#111827;
 }
 
-/* INPUT */
-input[type=text]{
-    padding:10px;
-    border-radius:8px;
-    border:1px solid #ccc;
+/* TITULOS */
+h2{
+
+    font-size:28px;
+
+    font-weight:700;
+
+    margin-bottom:22px;
+
+    color:white;
+
+}
+
+h3{
+
+    font-size:18px;
+
+    margin-bottom:12px;
+
+    color:white;
+
+}
+
+/* LABELS */
+label{
+
+    font-size:15px;
+
 }
 
 /* GRID */
 .grid{
+
     display:grid;
+
     grid-template-columns:1fr 1fr;
-    gap:10px;
+
+    gap:16px;
+
     align-items:start;
+
+    margin-top:15px;
+
 }
 
 /* BOXES */
 .box{
-    background:#fff;
-    padding:10px;
-    border-radius:10px;
-    border:1px solid #ddd;
+
+    background:#111827;
+
+    padding:16px;
+
+    border-radius:18px;
+
+    border:1px solid rgba(255,255,255,0.06);
+
+    transition:0.25s;
+
 }
 
-.acoes{
-    margin-top:15px;
+.box:hover{
+
+    border-color:#7b2cbf;
+
+    transform:translateY(-2px);
+
 }
 
 .box b{
+
     display:block;
-    margin-bottom:8px;
+
+    margin-bottom:12px;
+
+    font-size:16px;
+
+    color:white;
+
 }
 
 .box label{
+
     display:block;
-    margin-bottom:5px;
+
+    margin-bottom:10px;
+
     cursor:pointer;
+
+    color:#d1d5db;
+
+}
+
+/* AÇÕES */
+.acoes{
+
+    margin-top:18px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
 }
 
 /* BOTÕES */
 button{
+
     width:100%;
-    padding:10px;
-    margin-top:6px;
-    border:none;
-    border-radius:8px;
+
+    padding:14px;
+
+
+    border-radius:10px;
+
     cursor:pointer;
-    transition:0.2s;
-    font-weight:bold;
+
+    transition:0.25s;
+
+    font-weight:700;
+
+    font-size:14px;
+
+    letter-spacing: 0.3px;
+
 }
 
+/* HOVER */
 button:hover{
-    opacity:0.9;
-    transform:scale(1.01);
+
+    transform:translateY(-2px);
+
 }
 
+/* BOTÃO PRINCIPAL */
 .btn{
-    background:#4CAF50;
+
+    background:linear-gradient(
+        135deg,
+        #7b2cbf,
+        #9d4edd
+    );
+
     color:white;
+
+    box-shadow:
+        0 8px 20px rgba(123,44,191,0.35);
+
 }
 
+/* SECUNDÁRIO */
 .btn-sec{
-    background:#ccc;
+    background:#e5e7eb;
+    color:#111827;
 }
 
+/* EXCLUIR */
 .excluir{
-    background:#dc3545;
+
+    background:#dc2626;
+
     color:white;
+
+}
+
+/* LINHA */
+hr{
+
+    border:none;
+
+    height:1px;
+
+    background:rgba(255,255,255,0.08);
+
+    margin:22px 0;
+
+}
+
+/* TOTAL */
+#totalDia{
+
+    color:#22c55e;
+
+    font-weight:700;
+
+    font-size:22px;
+
 }
 
 /* PEDIDOS */
+/* PEDIDOS */
 .pedido{
-    border-radius:16px;
-    margin-bottom:14px;
+
+    border-radius:22px;
+
+    margin-bottom:16px;
+
     overflow:hidden;
+
     transition:0.25s;
-    box-shadow:0 3px 10px rgba(0,0,0,0.08);
-    border:1px solid rgba(0,0,0,0.04);
-}
 
-.preparo{
-    background:#fff3cd;
-    border-left:6px solid #ffc107;
-}
+    border:1px solid rgba(255,255,255,0.05);
 
-.finalizado{
-    background:#d4edda;
-    border-left:6px solid #28a745;
-}
+    background:#7e3e3e;
 
-.entrega{
-    background:#dbeafe;
-    border-left:6px solid #0d6efd;
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.25);
+
 }
 
 .recebido{
-    background:#fff3cd;
-    border-left:6px solid #ffc107;
+
+    border-left:6px solid #facc15;
+
 }
 
 .preparo{
-    background:#ffe5b4;
-    border-left:6px solid #fd7e14;
+
+    border-left:6px solid #fb923c;
+
+}
+
+.entrega{
+
+    border-left:6px solid #60a5fa;
+
+}
+
+.finalizado{
+
+    border-left:6px solid #22c55e;
+
 }
 
 .pedido:hover{
-    transform:translateY(-2px);
-    box-shadow:0 4px 12px rgba(0,0,0,0.12);
+
+    transform:translateY(-3px);
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,0.35);
+
 }
 
 /* HEADER */
 .header{
-    font-weight:bold;
+
+    font-weight:600;
+
     cursor:pointer;
-    padding:14px;
+
+    padding:18px;
+
     display:flex;
+
     align-items:center;
+
     justify-content:space-between;
+
     user-select:none;
+
     transition:0.2s;
+
     font-size:15px;
+
+    color:white;
+
+}
+
+.header:hover{
+
+    background:rgba(255,255,255,0.03);
+
 }
 
 .header:hover{
@@ -185,9 +352,15 @@ button:hover{
 }
 
 .detalhe.aberto{
-    padding:12px;
-    max-height:500px;
+
+    padding:18px;
+
+    max-height:700px;
+
     opacity:1;
+
+    color:#e5e7eb;
+
 }
 
 /* STATUS */
@@ -224,6 +397,384 @@ button:hover{
     box-sizing:border-box;
 }
 
+/* ========================= */
+/* RESPONSIVIDADE MOBILE */
+/* ========================= */
+
+@media (max-width: 900px){
+
+    body{
+        flex-direction:column;
+        gap:0;
+    }
+
+    .coluna{
+        width:100%;
+        padding:10px;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .header{
+        font-size:14px;
+    }
+
+    .pedido{
+        margin-bottom:10px;
+    }
+
+    button{
+        padding:14px;
+        font-size:15px;
+    }
+
+    h2{
+        font-size:20px;
+    }
+
+    h3{
+        font-size:17px;
+    }
+
+}
+
+/* CELULAR PEQUENO */
+@media (max-width: 500px){
+
+    body{
+        background:#eceef1;
+    }
+
+    .caixa{
+        padding:14px;
+        border-radius:14px;
+    }
+
+    .pedido{
+        border-radius:14px;
+    }
+
+    .header{
+        padding:12px;
+    }
+
+    input[type=text]{
+        font-size:16px;
+    }
+
+    button{
+        font-size:16px;
+        border-radius:10px;
+    }
+
+}
+
+/* ========================= */
+/* PAINEL FLUTUANTE PEDIDOS */
+/* ========================= */
+
+#btnPedidos{
+
+    position:fixed;
+    right:20px;
+    bottom:20px;
+
+    width:auto;
+
+    padding:14px 20px;
+
+    background:#7b2cbf;
+    color:white;
+
+    border-radius:50px;
+
+    z-index:9999;
+
+    box-shadow:0 6px 20px rgba(0,0,0,0.25);
+
+}
+
+#overlayPedidos{
+
+    position:fixed;
+    inset:0;
+
+    background:rgba(0,0,0,0.45);
+
+    opacity:0;
+    visibility:hidden;
+
+    transition:0.3s;
+
+    z-index:9997;
+
+}
+
+#overlayPedidos.ativo{
+
+    opacity:1;
+    visibility:visible;
+
+}
+
+.painel-pedidos{
+
+    position:fixed;
+
+    top:0;
+    right:-1000px;
+
+    width:420px;
+    max-width:100%;
+
+    height:100vh;
+
+    background:#f5f5f7;
+
+    z-index:9998;
+
+    overflow-y:auto;
+
+    transition:0.35s ease;
+
+    box-shadow:-5px 0 25px rgba(0,0,0,0.2);
+
+    padding:15px;
+
+}
+
+.painel-pedidos.aberto{
+
+    right:0;
+
+}
+
+.topo-painel{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    margin-bottom:15px;
+
+}
+
+.fechar-painel{
+
+    width:45px;
+    height:45px;
+
+    border-radius:50%;
+
+    background:#dc3545;
+    color:white;
+
+    font-size:18px;
+
+    padding:0;
+
+}
+
+.producao-grid{
+
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+
+}
+
+.producao-coluna{
+
+    width:100%;
+
+}
+
+/* DESKTOP */
+@media(min-width: 1000px){
+
+    .painel-pedidos{
+
+        width:480px;
+
+    }
+
+}
+
+/* CATEGORIAS */
+
+.categorias{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:15px;
+}
+
+.categoria{
+    background:white;
+    border-radius:16px;
+    overflow:hidden;
+    border:1px solid #e5e7eb;
+    box-shadow:0 2px 8px rgba(0,0,0,0.04);
+}
+
+.cat-header{
+    padding:16px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    font-weight:bold;
+    transition:0.2s;
+}
+
+.cat-header:hover{
+    background:#f9fafb;
+}
+
+.cat-body{
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+
+    transition:
+        max-height 0.3s ease,
+        opacity 0.2s ease,
+        padding 0.2s ease;
+
+    padding:0 16px;
+}
+
+.cat-body.aberto{
+    max-height:400px;
+    opacity:1;
+    padding:0 16px 16px;
+}
+
+.cat-body label{
+    display:block;
+    margin-top:10px;
+    cursor:pointer;
+}
+
+/* TEXTOS */
+
+h1,h2,h3,h4,b,label,span,div{
+    color:#111827;
+}
+
+/* INPUT */
+
+/* INPUT CLIENTE */
+
+.input-cliente{
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    width:100%;
+
+    background:white;
+
+    border:2px solid #e5e7eb;
+
+    border-radius:20px;
+
+    padding:4px 16px;
+
+    transition:0.25s ease;
+
+    box-shadow:
+        0 4px 14px rgba(0,0,0,0.05);
+
+    margin-bottom:0px;
+
+}
+
+.input-cliente:hover{
+
+    border-color:#d8b4fe;
+
+}
+
+.input-cliente:focus-within{
+
+    border-color:#7b2cbf;
+
+    box-shadow:
+        0 0 0 5px rgba(123,44,191,0.12),
+        0 8px 24px rgba(123,44,191,0.15);
+
+    transform:translateY(-1px);
+
+}
+
+.icone-cliente{
+
+    font-size:18px;
+
+    opacity:0.7;
+
+}
+
+.input-cliente input{
+
+    border:none;
+    outline:none;
+
+    width:100%;
+
+    background:transparent;
+
+    padding:16px 0;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    color:#111827;
+
+}
+
+.input-cliente input::placeholder{
+
+    color:#9ca3af;
+
+    font-weight:500;
+
+}
+
+
+/* CATEGORIAS */
+
+.cat-header{
+    background:white;
+    color:#111827;
+}
+
+.cat-body{
+    background:#fafafa;
+}
+
+/* LABELS */
+
+label{
+    color:#111827;
+}
+
+/* CARDS */
+
+.pedido{
+    color:#111827;
+}
+
+/* HEADER PEDIDO */
+
+.header{
+    color:#111827;
+}
 </style>
 </head>
 
@@ -239,11 +790,21 @@ button:hover{
 
 <div class="caixa">
 
-<h2>CAIXA</h2>
+<h2>🍧 MENALMEI GOURMET</h2>
 
-<input id="cliente"
-       placeholder="Nome do cliente"
-       style="width:100%;">
+<div class="input-cliente">
+
+    <span class="icone-cliente">
+        👤
+    </span>
+
+    <input
+        id="cliente"
+        type="text"
+        autocomplete="off"
+        placeholder="Digite o nome do cliente">
+
+</div>
 
 <br><br>
 
@@ -277,158 +838,165 @@ button:hover{
 
 <br>
 
-<!-- SUCOS -->
-<div class="box">
+<div class="categorias">
 
-<div class="header"
-     onclick="toggleSucos()">
+    <!-- SUCOS -->
+    <div class="categoria">
 
-    <span>🥤 Sucos de Açaí</span>
+        <div class="cat-header"
+             onclick="toggleCategoria('sucos')">
 
-    <span id="seta-suco"
-          class="seta">
+            <span>🥤 Sucos de Açaí</span>
 
-        ▶
+            <span id="seta-sucos"
+                  class="seta">
 
-    </span>
+                ▶
 
-</div>
+            </span>
 
-<div id="areaSucos"
-     class="detalhe">
+        </div>
 
-    <label>
-    <input type="radio"
-           name="suco"
-           value=""
-           checked>
+        <div id="sucos"
+             class="cat-body">
 
-    Nenhum
-    </label>
+            <label>
+            <input type="radio"
+                   name="suco"
+                   value=""
+                   checked>
 
-    <label>
-    <input type="radio"
-           name="suco"
-           value="Açaí com Morango|10">
+            Nenhum
+            </label>
 
-    Açaí com Morango (R$10)
-    </label>
+            <label>
+            <input type="radio"
+                   name="suco"
+                   value="Açaí com Morango|10">
 
-    <label>
-    <input type="radio"
-           name="suco"
-           value="Açaí com Maracujá|10">
+            Açaí com Morango (R$10)
+            </label>
 
-    Açaí com Maracujá (R$10)
-    </label>
+            <label>
+            <input type="radio"
+                   name="suco"
+                   value="Açaí com Maracujá|10">
 
-    <label>
-    <input type="radio"
-           name="suco"
-           value="Açaí com Banana|10">
+            Açaí com Maracujá (R$10)
+            </label>
 
-    Açaí com Banana (R$10)
-    </label>
+            <label>
+            <input type="radio"
+                   name="suco"
+                   value="Açaí com Banana|10">
 
-    <label>
-    <input type="radio"
-           name="suco"
-           value="Açaí Napolitano|10">
+            Açaí com Banana (R$10)
+            </label>
 
-    Açaí Napolitano (R$10)
-    </label>
+            <label>
+            <input type="radio"
+                   name="suco"
+                   value="Açaí Napolitano|10">
 
-    <label>
-    <input type="radio"
-           name="suco"
-           value="Açaí com Nutella|15">
+            Açaí Napolitano (R$10)
+            </label>
 
-    Açaí com Nutella (R$15)
-    </label>
+            <label>
+            <input type="radio"
+                   name="suco"
+                   value="Açaí Leite em Pó e Condensado|12">
 
-    <label>
-    <input type="radio"
-           name="suco"
-           value="Açaí com Leite em Pó e Leite Condensado|12">
+            Açaí Leite em Pó e Condensado (R$12)
+            </label>
+        </div>
 
-    Leite em Pó + Condensado (R$12)
-    </label>
+    </div>
 
-</div>
+    <!-- COMPLEMENTOS -->
+    <div class="categoria">
 
-</div>
+        <div class="cat-header"
+             onclick="toggleCategoria('complementos')">
 
-<br>
+            <span>🥣 Complementos</span>
 
-<!-- GRID -->
-<div class="grid">
+            <span id="seta-complementos"
+                  class="seta">
 
-<!-- COMPLEMENTOS -->
-<div class="box">
+                ▶
 
-<b>🥣 Complementos</b>
+            </span>
 
-<label><input type="checkbox" value="Leite Condensado"> Leite Condensado</label>
-<label><input type="checkbox" value="Leite em Pó"> Leite em Pó</label>
-<label><input type="checkbox" value="Sucrilhos"> Sucrilhos</label>
-<label><input type="checkbox" value="Granola"> Granola</label>
-<label><input type="checkbox" value="Paçoca"> Paçoca</label>
+        </div>
 
-</div>
+        <div id="complementos"
+             class="cat-body">
 
-<!-- FRUTAS -->
-<div class="box">
+            <label><input type="checkbox" value="Leite Condensado"> Leite Condensado</label>
+            <label><input type="checkbox" value="Leite em Pó"> Leite em Pó</label>
+            <label><input type="checkbox" value="Granola"> Granola</label>
+            <label><input type="checkbox" value="Sucrilhos"> Sucrilhos</label>
+            <label><input type="checkbox" value="Paçoca"> Paçoca</label>
 
-<b>🍓 Frutas</b>
+        </div>
 
-<label><input type="checkbox" value="Morango"> Morango</label>
-<label><input type="checkbox" value="Uva"> Uva</label>
-<label><input type="checkbox" value="Banana"> Banana</label>
+    </div>
 
-</div>
+    <!-- FRUTAS -->
+    <div class="categoria">
 
-<!-- ADICIONAIS -->
-<div class="box">
+        <div class="cat-header"
+             onclick="toggleCategoria('frutas')">
 
-<div class="header"
-     onclick="toggleAdicionais()">
+            <span>🍓 Frutas</span>
 
-    <span>🍫 Adicionais</span>
+            <span id="seta-frutas"
+                  class="seta">
 
-    <span id="seta-adicionais"
-          class="seta">
+                ▶
 
-        ▶
+            </span>
 
-    </span>
+        </div>
 
-</div>
+        <div id="frutas"
+             class="cat-body">
 
-<div id="areaAdicionais"
-     class="detalhe">
+            <label><input type="checkbox" value="Morango"> Morango</label>
+            <label><input type="checkbox" value="Banana"> Banana</label>
+            <label><input type="checkbox" value="Uva"> Uva</label>
 
-    <label>
-    <input type="checkbox"
-           value="Nutella|5">
+        </div>
 
-    Nutella (+R$5)
-    </label>
+    </div>
 
-    <label>
-    <input type="checkbox"
-           value="Ovomaltine|3">
+    <!-- ADICIONAIS -->
+    <div class="categoria">
 
-    Ovomaltine (+R$3)
-    </label>
+        <div class="cat-header"
+             onclick="toggleCategoria('adicionais')">
 
-    <label>
-    <input type="checkbox"
-           value="Confete de chocolate|3">
+            <span>🍫 Adicionais</span>
 
-    Confete (+R$3)
-    </label>
+            <span id="seta-adicionais"
+                  class="seta">
 
-</div>
+                ▶
+
+            </span>
+
+        </div>
+
+        <div id="adicionais"
+             class="cat-body">
+
+            <label><input type="checkbox" value="Nutella|5"> Nutella (+R$5)</label>
+            <label><input type="checkbox" value="Ovomaltine|3"> Ovomaltine (+R$3)</label>
+            <label><input type="checkbox" value="Confete Choc|3"> Confete Choc (+R$3)</label>
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -461,32 +1029,58 @@ R$ <span id="totalDia">0.00</span>
 </div>
 </div>
 
-<!-- PRODUÇÃO -->
-<div class="coluna">
+<!-- BOTÃO FLUTUANTE -->
+<button id="btnPedidos" onclick="togglePainelPedidos()">
 
-<h2>PRODUÇÃO</h2>
+📦 Pedidos
 
-<div style="display:flex; gap:10px;">
+</button>
 
-<!-- PREPARO -->
-<div style="width:50%;">
-
-<h3>🟡 Em preparo</h3>
-
-<div id="colPreparo"></div>
+<!-- FUNDO ESCURO -->
+<div id="overlayPedidos"
+     onclick="fecharPainelPedidos()">
 
 </div>
 
-<!-- PRONTOS -->
-<div style="width:50%;">
+<!-- PAINEL PRODUÇÃO -->
+<div class="painel-pedidos"
+     id="painelPedidos">
 
-<h3>🟢 Prontos</h3>
+    <div class="topo-painel">
 
-<div id="colPronto"></div>
+        <h2>PRODUÇÃO</h2>
 
-</div>
+        <button class="fechar-painel"
+                onclick="fecharPainelPedidos()">
 
-</div>
+            ✕
+
+        </button>
+
+    </div>
+
+    <div class="producao-grid">
+
+        <!-- PREPARO -->
+        <div class="producao-coluna">
+
+            <h3>🟡 Em preparo</h3>
+
+            <div id="colPreparo"></div>
+
+        </div>
+
+        <!-- FINALIZADOS -->
+        <div class="producao-coluna">
+
+            <h3>🟢 Finalizados</h3>
+
+            <div id="colPronto"></div>
+
+        </div>
+
+    </div>
+
 </div>
 
 <script>
@@ -932,7 +1526,7 @@ function atualizarTela(){
                     p.status !== "finalizado"
                     ?
                     `
-                    <button onclick="mudarStatus(${p.numero})">
+                    <button onclick="event.stopPropagation(); mudarStatus(${p.numero})">
 
                         ${textoBotao}
 
@@ -946,14 +1540,14 @@ function atualizarTela(){
                     `
                 }
 
-                <button onclick="imprimirPedido(${p.numero})">
+                <button onclick="event.stopPropagation(); imprimirPedido(${p.numero})">
 
                     🖨 Reimprimir Comanda
 
                 </button>
 
                 <button class="excluir"
-                        onclick="excluirPedido(${p.numero})">
+                onclick="event.stopPropagation(); excluirPedido(${p.numero})">
 
                     🗑 Excluir Pedido
 
@@ -1070,27 +1664,15 @@ function togglePedido(numero){
 
 }
 
-function toggleSucos(){
+function toggleCategoria(id){
 
     let area =
-        document.getElementById("areaSucos");
+        document.getElementById(id);
 
     let seta =
-        document.getElementById("seta-suco");
-
-    area.classList.toggle("aberto");
-
-    seta.classList.toggle("aberta");
-
-}
-
-function toggleAdicionais(){
-
-    let area =
-        document.getElementById("areaAdicionais");
-
-    let seta =
-        document.getElementById("seta-adicionais");
+        document.getElementById(
+            "seta-" + id
+        );
 
     area.classList.toggle("aberto");
 
@@ -1155,6 +1737,31 @@ function excluirPedido(numero){
     salvar();
 
     atualizarTela();
+
+}
+
+/* PAINEL PEDIDOS */
+function togglePainelPedidos(){
+
+    document
+    .getElementById("painelPedidos")
+    .classList.toggle("aberto");
+
+    document
+    .getElementById("overlayPedidos")
+    .classList.toggle("ativo");
+
+}
+
+function fecharPainelPedidos(){
+
+    document
+    .getElementById("painelPedidos")
+    .classList.remove("aberto");
+
+    document
+    .getElementById("overlayPedidos")
+    .classList.remove("ativo");
 
 }
 
