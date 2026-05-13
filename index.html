@@ -775,6 +775,59 @@ label{
 .header{
     color:#111827;
 }
+
+/* TIPO VENDA */
+
+.tipo-venda{
+
+    margin-top:18px;
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:16px;
+
+    border:1px solid #e5e7eb;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,0.04);
+
+}
+
+.opcao-venda{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:12px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    transition:0.2s;
+
+    margin-top:8px;
+
+    font-weight:600;
+
+}
+
+.opcao-venda:hover{
+
+    background:#f3f4f6;
+
+}
+
+.opcao-venda input{
+
+    transform:scale(1.2);
+
+}
 </style>
 </head>
 
@@ -806,10 +859,10 @@ label{
 
 </div>
 
-<br><br>
+<br>
 
 <!-- TAMANHOS -->
-<b>Tamanho</b>
+<!-- <b>Tamanho</b> -->
 
 <label>
 <input type="radio"
@@ -834,6 +887,14 @@ label{
        value="770ml|25">
 
 🥤 770ml
+</label>
+
+<label>
+<input type="radio"
+       name="tamanho"
+       value="Combo Casal|25">
+
+💕 Combo Casal
 </label>
 
 <br>
@@ -908,6 +969,15 @@ label{
 
             Açaí Leite em Pó e Condensado (R$12)
             </label>
+
+           <label>
+           <input type="radio"
+                   name="suco"
+                   value="Açaí com Nutella|15">
+
+           Açaí com Nutella (R$15)
+           </label>
+
         </div>
 
     </div>
@@ -1000,6 +1070,47 @@ label{
 
 </div>
 
+<!-- TIPO DE VENDA -->
+
+<div class="tipo-venda">
+
+    <b style="margin-bottom:10px; display:block;">
+        💳 Tipo de Venda
+    </b>
+
+    <label class="opcao-venda">
+
+        <input type="radio"
+               name="tipoVenda"
+               value="Loja"
+               checked>
+
+        🏪 Venda na Loja
+
+    </label>
+
+    <label class="opcao-venda">
+
+        <input type="radio"
+               name="tipoVenda"
+               value="Ifood Proprio">
+
+        🛵 iFood Próprio (+15,2%)
+
+    </label>
+
+    <label class="opcao-venda">
+
+        <input type="radio"
+               name="tipoVenda"
+               value="Ifood Parceiro">
+
+        🍔 iFood Parceiro (+26,2%)
+
+    </label>
+
+</div>
+
 <!-- BOTÕES -->
 <div class="acoes">
 
@@ -1085,12 +1196,25 @@ R$ <span id="totalDia">0.00</span>
 
 <script>
 
-let pedidos =
-    JSON.parse(localStorage.getItem("pedidos"))
-    || [];
+let pedidos = [];
+
+try{
+
+    pedidos =
+        JSON.parse(
+            localStorage.getItem("pedidos")
+        ) || [];
+
+}catch{
+
+    pedidos = [];
+
+}
 
 let contador =
-    pedidos.length + 1;
+    pedidos.length
+    ? Math.max(...pedidos.map(p => p.numero)) + 1
+    : 1;
 
 /* SALVAR */
 function salvar(){
@@ -1150,12 +1274,20 @@ function novoPedido(){
     ).forEach(c => c.checked = false);
 
     document.querySelectorAll(
-        'input[name="suco"]'
-    ).forEach(r => r.checked = false);
+    'input[name="suco"]'
+).forEach(r => {
+
+    r.checked = false;
+
+});
 
     document.querySelector(
         'input[name="suco"][value=""]'
     ).checked = true;
+
+document.querySelector(
+    'input[name="tipoVenda"][value="Loja"]'
+).checked = true;
 
 }
 
@@ -1200,58 +1332,85 @@ async function conectarQZ(){
 
 }
 
+
+
 /* IMPRIMIR */
 async function imprimir(p){
 
-    await conectarQZ();
+    try{
 
-    let texto =
+        // conecta QZ
+        if(!qz.websocket.isActive()){
 
-        "\x1B\x61\x01" +
+            await qz.websocket.connect();
 
-        "MENALMEI GOURMET\n" +
+        }
 
-        "==============================\n" +
+        // TEXTO COMANDA
+        let texto = "";
 
-        "\x1B\x21\x30" +
+        texto += "\x1B\x40"; // inicia impressora
 
-        "PEDIDO #" + p.numero + "\n" +
+        texto += "\x1B\x61\x01"; // centraliza
+        texto += "MENALMEI GOURMET\n";
+        texto += "==============================\n";
 
-        "\x1B\x21\x00" +
+        texto += "\x1B\x21\x20"; // destaque
+        texto += "PEDIDO #" + p.numero + "\n";
 
-        "==============================\n\n" +
+        texto += "\x1B\x21\x00"; // normal
+        texto += "==============================\n\n";
 
-        "\x1B\x61\x00" +
+        texto += "\x1B\x61\x00"; // esquerda
 
-        "Cliente: " + p.cliente + "\n" +
+        texto += "Cliente: " + p.cliente + "\n";
+        texto += "Venda: " + p.tipoVenda + "\n";
+        texto += "Data: " + new Date().toLocaleString('pt-BR') + "\n\n";
 
-        "Data: " +
-        new Date().toLocaleString() +
-        "\n\n" +
+        texto += p.itens + "\n";
 
-        p.itens + "\n" +
+        texto += "------------------------------\n";
 
-        "------------------------------\n" +
+        texto += "Subtotal: R$ " + Number(p.subtotal || 0).toFixed(2) + "\n";
+        texto += "Taxa: R$ " + Number(p.taxa || 0).toFixed(2) + "\n";
 
-        "TOTAL: R$ " +
-        p.total.toFixed(2) +
-        "\n\n" +
+        texto += "TOTAL LIQUIDO: R$ " + Number(p.total || 0).toFixed(2) + "\n";
 
-        "Status: " + p.status + "\n\n" +
+        texto += "------------------------------\n\n";
 
-        "Obrigado pela preferência!\n\n\n";
+        texto += "Status: " + p.status + "\n\n";
 
-    let printer =
-        await qz.printers.getDefault();
+        texto += "Obrigado pela preferencia!\n\n\n\n";
 
-    let config =
-        qz.configs.create(printer);
+        texto += "\x1D\x56\x41\x10"; // corte papel
 
-    await qz.print(config,[{
-        type:'raw',
-        format:'plain',
-        data:texto + '\x1D\x56\x00'
-    }]);
+        // pega impressora padrão
+        const printer =
+            await qz.printers.getDefault();
+
+        // config correta
+        const config =
+            qz.configs.create(printer);
+
+        // imprime RAW corretamente
+        await qz.print(config, [{
+            type: 'raw',
+            format: 'plain',
+            data: texto
+        }]);
+
+        console.log("IMPRESSO COM SUCESSO");
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        alert(
+            "Erro ao imprimir:\n\n" + err
+        );
+
+    }
 
 }
 
@@ -1272,96 +1431,301 @@ function imprimirPedido(numero){
 }
 
 /* CRIAR PEDIDO */
+
 function criarPedido(){
 
-    let cliente =
-        document.getElementById("cliente").value;
+    try{
 
-    let itensTxt = "";
-    let total = 0;
+        let cliente =
+            document.getElementById("cliente")
+            .value
+            .trim();
 
-    let sucoSel =
-        document.querySelector(
-            'input[name="suco"]:checked'
-        );
+        if(cliente === ""){
 
-    if(
-        sucoSel &&
-        sucoSel.value !== ""
-    ){
+            alert("Digite o nome do cliente");
+            return;
 
-        let [nome,preco] =
-            sucoSel.value.split("|");
+        }
 
-        itensTxt +=
-            "SUCO: " + nome + "\n";
+        let itensTxt = "";
+        let total = 0;
 
-        total += parseFloat(preco);
-
-    }else{
-
-        let [tam,preco] =
+        // tipo venda
+        let vendaSelecionada =
             document.querySelector(
-                'input[name="tamanho"]:checked'
-            ).value.split("|");
+                'input[name="tipoVenda"]:checked'
+            );
 
-        itensTxt +=
-            "Açaí " + tam + "\n";
+        let tipoVenda =
+            vendaSelecionada
+            ? vendaSelecionada.value
+            : "Loja";
 
-        total += parseFloat(preco);
+        let taxa = 0;
 
-        document.querySelectorAll(
-            "input[type=checkbox]:checked"
-        ).forEach(c => {
+        // suco
+        let sucoSel =
+            document.querySelector(
+                'input[name="suco"]:checked'
+            );
 
-            if(c.value.includes("|")){
+        // =========================
+        // SUCOS
+        // =========================
 
-                let [nome,valor] =
-                    c.value.split("|");
+        if(
+            sucoSel &&
+            sucoSel.value !== ""
+        ){
 
-                itensTxt +=
-                    "- " + nome + "\n";
+            let [nome, precoLoja] =
+                sucoSel.value.split("|");
 
-                total +=
-                    parseFloat(valor);
+            precoLoja =
+                parseFloat(precoLoja);
 
-            }else{
+            let preco = precoLoja;
+
+            // PREÇOS IFOOD
+            if(
+                tipoVenda === "Ifood Proprio" ||
+                tipoVenda === "Ifood Parceiro"
+            ){
+
+                // leite em pó e condensado
+                if(
+                    nome.includes("Leite em Pó")
+                ){
+
+                    preco = 17.99;
+
+                }
+
+                // nutella
+                else if(
+                    nome.includes("Nutella")
+                ){
+
+                    preco = 17.99;
+
+                }
+
+                // todos os outros
+                else{
+
+                    preco = 14.99;
+
+                }
+
+            }
+
+            itensTxt +=
+                "SUCO: " + nome + "\n";
+
+            total += preco;
+
+        }
+
+        // =========================
+        // AÇAÍ
+        // =========================
+
+        else{
+
+            let tamanho =
+                document.querySelector(
+                    'input[name="tamanho"]:checked'
+                );
+
+            let [tam, precoLoja] =
+                tamanho.value.split("|");
+
+            precoLoja =
+                parseFloat(precoLoja);
+
+            let preco = precoLoja;
+
+            // PREÇOS IFOOD
+            if(
+                tipoVenda === "Ifood Proprio" ||
+                tipoVenda === "Ifood Parceiro"
+            ){
+
+if(tam === "330ml"){
+
+    preco = 17.99;
+
+}
+else if(tam === "550ml"){
+
+    preco = 23.99;
+
+}
+else if(tam === "770ml"){
+
+    preco = 32.99;
+
+}
+else if(tam === "Combo Casal"){
+
+    preco = 29.99;
+
+}
+
+            }
+
+            itensTxt +=
+                "Açaí " + tam + "\n";
+
+            total += preco;
+
+            // =========================
+            // COMPLEMENTOS
+            // =========================
+
+            document.querySelectorAll(
+                '#complementos input[type="checkbox"]:checked'
+            ).forEach(c => {
 
                 itensTxt +=
                     "- " + c.value + "\n";
 
-            }
+            });
 
-        });
+            // =========================
+            // FRUTAS
+            // =========================
 
-    }
+            document.querySelectorAll(
+                '#frutas input[type="checkbox"]:checked'
+            ).forEach(c => {
 
-    let pedido = {
+                itensTxt +=
+                    "- " + c.value + "\n";
 
-    numero:contador++,
+            });
+
+            // =========================
+            // ADICIONAIS
+            // =========================
+
+            document.querySelectorAll(
+                '#adicionais input[type="checkbox"]:checked'
+            ).forEach(c => {
+
+                if(c.value.includes("|")){
+
+                    let [nome, valor] =
+                        c.value.split("|");
+
+                    valor =
+                        parseFloat(valor);
+
+                    itensTxt +=
+                        "- " + nome + "\n";
+
+                    total += valor;
+
+                }
+
+            });
+
+        }
+
+        // =========================
+        // TAXAS IFOOD
+        // =========================
+
+        if(tipoVenda === "Ifood Proprio"){
+
+            taxa = total * 0.152;
+
+        }
+        else if(tipoVenda === "Ifood Parceiro"){
+
+            taxa = total * 0.262;
+
+        }
+
+        // TOTAL LIQUIDO
+        let totalFinal =
+            total - taxa;
+
+        // PEDIDO
+        // status automático
+let statusInicial = "recebido";
+
+// pedidos do iFood entram finalizados
+if(
+    tipoVenda === "Ifood Proprio" ||
+    tipoVenda === "Ifood Parceiro"
+){
+
+    statusInicial = "finalizado";
+
+}
+
+let pedido = {
+
+    numero: contador++,
+
     cliente,
-    itens:itensTxt,
-    total,
 
-    data:new Date(),
+    itens: itensTxt,
 
-    status:"recebido"
+    subtotal: total,
+
+    taxa,
+
+    total: totalFinal,
+
+    tipoVenda,
+
+    data: new Date(),
+
+    status: statusInicial,
+
+    tempoFinal:
+        statusInicial === "finalizado"
+        ? "00:00"
+        : null
 
 };
 
-    pedidos.push(pedido);
+        pedidos.push(pedido);
 
-    salvar();
+        salvar();
 
-    atualizarTela();
+        atualizarTela();
 
-    imprimir(pedido);
+        imprimir(pedido).catch(err => {
 
-    tocarSom();
+            console.log(
+                "Erro impressão:",
+                err
+            );
 
-    novoPedido();
+        });
+
+        tocarSom();
+
+        novoPedido();
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        alert(
+            "Erro ao criar pedido:\n\n" +
+            err.message
+        );
+
+    }
 
 }
+
 
 /* ATUALIZAR */
 /* ATUALIZAR */
@@ -1378,7 +1742,7 @@ function atualizarTela(){
 
     pedidos.forEach(p => {
 
-        totalDia += p.total;
+        totalDia += Number(p.total || 0);
 
         // abre apenas o último pedido que NÃO foi finalizado
         let aberto = "";
@@ -1476,7 +1840,23 @@ function atualizarTela(){
                  class="detalhe ${aberto}">
 
                 ${p.itens.replace(/\n/g,"<br>")}
+                <br>
 
+<b>
+💳 ${p.tipoVenda}
+</b>
+
+<br>
+
+<small>
+Subtotal: R$ ${Number(p.subtotal || 0).toFixed(2)}
+</small>
+
+<br>
+
+<small>
+Taxa: R$ ${Number(p.taxa || 0).toFixed(2)}
+</small>
                 <br><br>
 
                 <div style="
@@ -1486,7 +1866,7 @@ function atualizarTela(){
                 ">
 
                     <b>
-                    💰 R$ ${p.total.toFixed(2)}
+                    💰 R$ ${Number(p.total || 0).toFixed(2)}
                     </b>
 
                     <div id="tempo-${p.numero}" style="
