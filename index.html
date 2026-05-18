@@ -1386,7 +1386,7 @@ R$ <span id="totalDia">0.00</span>
 <script>
 
 const API_URL =
-"https://script.google.com/macros/s/AKfycbyi_yyg4dopatbQh2TWKF5BfMt0MTKupTm8tEHqRKCL2rCieI_h_1ABhgyiFvgkSHVO/exec";
+"https://script.google.com/macros/s/AKfycbzLCI-7HDDghQCiFtR1xcGxr7LTNul6gRnwE4KGZcEcyqaY1eKEah6Gno2c-0goQQi_/exec";
 
 let senhaAdmin = "";
 let produtosLoja = [];
@@ -2479,6 +2479,40 @@ function mudarStatus(numero){
 
 }
 
+async function excluirPedidoPlanilha(numero){
+
+    try{
+
+        await fetch(API_URL, {
+
+            method: "POST",
+
+            body: JSON.stringify({
+
+                acao: "excluir",
+
+                numero: numero
+
+            })
+
+        });
+
+        console.log(
+            "Pedido removido da planilha"
+        );
+
+    }
+    catch(err){
+
+        console.log(
+            "Erro ao excluir:",
+            err
+        );
+
+    }
+
+}
+
 /* EXCLUIR */
 function excluirPedido(numero){
 
@@ -2492,6 +2526,8 @@ function excluirPedido(numero){
         pedidos.filter(
             p => p.numero !== numero
         );
+
+excluirPedidoPlanilha(numero);
 
     salvar();
 
