@@ -1425,6 +1425,17 @@ function receberProdutos(dados){
     produtosLoja = dados.loja;
 
     produtosIfood = dados.ifood;
+
+pedidos = dados.pedidos || [];
+
+contador =
+    pedidos.length
+    ? Math.max(...pedidos.map(p => Number(p.numero))) + 1
+    : 1;
+
+atualizarTela();
+atualizarDashboard();
+
    
     senhaAdmin = dados.senha || "";
     console.log("SENHA RECEBIDA:", senhaAdmin);
