@@ -1386,7 +1386,7 @@ R$ <span id="totalDia">0.00</span>
 <script>
 
 const API_URL =
-"https://script.google.com/macros/s/AKfycbzLCI-7HDDghQCiFtR1xcGxr7LTNul6gRnwE4KGZcEcyqaY1eKEah6Gno2c-0goQQi_/exec";
+"https://script.google.com/macros/s/AKfycbwX06nfYKiSM3V_czQJtzUcad2wVUdg-KwT_Dpd_UxXmaIMsp-jSZba4orGRIwuM-TW/exec";
 
 let senhaAdmin = "";
 let produtosLoja = [];
@@ -1426,6 +1426,8 @@ function receberProdutos(dados){
 
     produtosIfood = dados.ifood;
 
+    pedidos = dados.pedidos || [];
+
 pedidos = dados.pedidos || [];
 
 contador =
@@ -1450,19 +1452,6 @@ atualizarDashboard();
 carregarProdutos();
 
 let pedidos = [];
-
-try{
-
-    pedidos =
-        JSON.parse(
-            localStorage.getItem("pedidos")
-        ) || [];
-
-}catch{
-
-    pedidos = [];
-
-}
 
 let contador =
     pedidos.length
@@ -1995,8 +1984,6 @@ function criarPedido(){
         };
 
         pedidos.push(pedido);
-
-        salvar();
 
         salvarVendaPlanilha(pedido);
 
