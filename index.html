@@ -1573,7 +1573,7 @@ function receberProdutos(dados){
         !==
         JSON.stringify(pedidos);
 
-    // SÓ ATUALIZA SE REALMENTE MUDAR
+    // SÓ ATUALIZA SE MUDAR
     if(mudou){
 
         pedidos = pedidosAPI;
@@ -1591,15 +1591,12 @@ function receberProdutos(dados){
 
         atualizarDashboard();
 
-document
-    .getElementById("loading")
-    .classList.add("esconder");
-
-        console.log(
-            "Pedidos sincronizados"
-        );
-
     }
+
+    // ESCONDE O LOADING SEMPRE
+    document
+        .getElementById("loading")
+        .classList.add("esconder");
 
 }
 
