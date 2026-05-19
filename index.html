@@ -1545,11 +1545,25 @@ console.log(lista);
 
 function carregarProdutos(){
 
+    // REMOVE SCRIPT ANTIGO
+    let antigo =
+        document.getElementById("scriptAPI");
+
+    if(antigo){
+
+        antigo.remove();
+
+    }
+
     let script =
         document.createElement("script");
 
+    script.id = "scriptAPI";
+
     script.src =
-        API_URL + "?callback=receberProdutos";
+        API_URL +
+        "?callback=receberProdutos&_=" +
+        new Date().getTime();
 
     document.body.appendChild(script);
 
@@ -2772,6 +2786,21 @@ function fecharFinanceiro(){
     .classList.remove("ativo");
 
 }
+
+// FAILSAFE LOADING ANDROID
+
+setTimeout(() => {
+
+    let loading =
+        document.getElementById("loading");
+
+    if(loading){
+
+        loading.classList.add("esconder");
+
+    }
+
+}, 5000);
 
 /* INICIAR */
 atualizarTela();
