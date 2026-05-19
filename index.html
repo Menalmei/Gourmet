@@ -919,10 +919,145 @@ label{
     margin-top:20px;
 
 }
+
+/* ========================= */
+/* LOADING SCREEN */
+/* ========================= */
+
+#loading{
+
+    position:fixed;
+    inset:0;
+
+    background:#f3f4f6;
+
+    z-index:999999;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transition:0.5s ease;
+
+}
+
+#loading.esconder{
+
+    opacity:0;
+    visibility:hidden;
+
+}
+
+.loading-box{
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:25px;
+
+}
+
+.logo-loading{
+
+    width:170px;
+
+    animation:pulse 1.5s infinite;
+
+}
+
+@keyframes pulse{
+
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.05);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
+}
+
+.loader-bar{
+
+    width:240px;
+    height:10px;
+
+    background:#e5e7eb;
+
+    border-radius:999px;
+
+    overflow:hidden;
+
+}
+
+.loader-fill{
+
+    width:40%;
+    height:100%;
+
+    background:linear-gradient(
+        90deg,
+        #7b2cbf,
+        #9d4edd
+    );
+
+    border-radius:999px;
+
+    animation:loadingMove 1s infinite linear;
+
+}
+
+@keyframes loadingMove{
+
+    0%{
+        transform:translateX(-100%);
+    }
+
+    100%{
+        transform:translateX(350%);
+    }
+
+}
+
+.loading-text{
+
+    font-weight:600;
+
+    color:#6b7280;
+
+    font-size:15px;
+
+}
 </style>
 </head>
 
 <body>
+
+<!-- LOADING -->
+<div id="loading">
+
+    <div class="loading-box">
+
+        <img src="logo.png"
+             class="logo-loading">
+
+        <div class="loader-bar">
+
+            <div class="loader-fill"></div>
+
+        </div>
+
+        <p class="loading-text">
+            Carregando sistema...
+        </p>
+
+    </div>
+
+</div>
 
 <!-- SOM -->
 <audio id="som" preload="auto">
@@ -1455,6 +1590,10 @@ function receberProdutos(dados){
         atualizarTela();
 
         atualizarDashboard();
+
+document
+    .getElementById("loading")
+    .classList.add("esconder");
 
         console.log(
             "Pedidos sincronizados"
@@ -2523,12 +2662,6 @@ async function excluirPedidoPlanilha(numero){
 
 /* EXCLUIR */
 function excluirPedido(numero){
-
-    if(
-        !confirm(
-            "Deseja excluir este pedido?"
-        )
-    ) return;
 
     pedidos =
         pedidos.filter(
