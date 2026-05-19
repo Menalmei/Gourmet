@@ -1426,30 +1426,51 @@ function receberProdutos(dados){
 
     produtosIfood = dados.ifood;
 
-    pedidos = dados.pedidos || [];
-
-pedidos = dados.pedidos || [];
-
-contador =
-    pedidos.length
-    ? Math.max(...pedidos.map(p => Number(p.numero))) + 1
-    : 1;
-
-atualizarTela();
-atualizarDashboard();
-
-   
     senhaAdmin = dados.senha || "";
-    console.log("SENHA RECEBIDA:", senhaAdmin);
 
-    console.log(
-        "Produtos carregados:",
-        dados
-    );
+    // PEDIDOS VINDOS DA PLANILHA
+    let pedidosAPI =
+        dados.pedidos || [];
+
+    // VERIFICA SE MUDOU
+    let mudou =
+        JSON.stringify(pedidosAPI)
+        !==
+        JSON.stringify(pedidos);
+
+    // SÓ ATUALIZA SE REALMENTE MUDAR
+    if(mudou){
+
+        pedidos = pedidosAPI;
+
+        contador =
+            pedidos.length
+            ? Math.max(
+                ...pedidos.map(
+                    p => Number(p.numero)
+                )
+            ) + 1
+            : 1;
+
+        atualizarTela();
+
+        atualizarDashboard();
+
+        console.log(
+            "Pedidos sincronizados"
+        );
+
+    }
 
 }
 
 carregarProdutos();
+
+setInterval(() => {
+
+    carregarProdutos();
+
+}, 1000);
 
 let pedidos = [];
 
