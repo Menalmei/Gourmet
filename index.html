@@ -1521,7 +1521,7 @@ R$ <span id="totalDia">0.00</span>
 <script>
 
 const API_URL =
-"https://script.google.com/macros/s/AKfycbwX06nfYKiSM3V_czQJtzUcad2wVUdg-KwT_Dpd_UxXmaIMsp-jSZba4orGRIwuM-TW/exec";
+"https://script.google.com/macros/s/AKfycbwcVv1-BOvz7xKSIXdGCkd9JcxS2-6ckzjTKF1568TqeC2xTuqiA6si2-tvsSAB5Own/exec";
 
 let senhaAdmin = "";
 let produtosLoja = [];
@@ -1543,29 +1543,29 @@ console.log(lista);
 
 }
 
-function carregarProdutos(){
+async function carregarProdutos(){
 
-    // REMOVE SCRIPT ANTIGO
-    let antigo =
-        document.getElementById("scriptAPI");
+    try{
 
-    if(antigo){
+        const resposta =
+            await fetch(
+                API_URL + "?t=" + Date.now()
+            );
 
-        antigo.remove();
+        const dados =
+            await resposta.json();
+
+        receberProdutos(dados);
 
     }
+    catch(err){
 
-    let script =
-        document.createElement("script");
+        console.log(
+            "Erro ao carregar:",
+            err
+        );
 
-    script.id = "scriptAPI";
-
-    script.src =
-        API_URL +
-        "?callback=receberProdutos&_=" +
-        new Date().getTime();
-
-    document.body.appendChild(script);
+    }
 
 }
 
