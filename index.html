@@ -1530,7 +1530,7 @@ R$ <span id="totalDia">0.00</span>
 <script>
 
 const API_URL =
-"https://script.google.com/macros/s/AKfycbwcVv1-BOvz7xKSIXdGCkd9JcxS2-6ckzjTKF1568TqeC2xTuqiA6si2-tvsSAB5Own/exec";
+"https://script.google.com/macros/s/AKfycbx1QEY1fgd6VIKB9x7dV8N37puNBMERO3oHsihrZcIJ5ICNhCxAJXHObCYWmeSNZdo/exec";
 
 let senhaAdmin = "";
 let produtosLoja = [];
@@ -1654,17 +1654,12 @@ function tempoDecorrido(pedido){
 
     // PARA O TEMPO
     if(
-        pedido.status === "entrega" ||
-        pedido.status === "finalizado"
-    ){
+    pedido.status === "finalizado"
+){
 
-        if(pedido.tempoFinal){
+    return pedido.tempoFinal || "Finalizado";
 
-            return pedido.tempoFinal;
-
-        }
-
-    }
+}
 
     let agora = new Date();
 
@@ -1867,7 +1862,7 @@ console.log("ENVIANDO PARA PLANILHA", pedido);
                 total: pedido.total,
                 tipoVenda: pedido.tipoVenda,
                 status: pedido.status,
-                data: new Date().toLocaleString('pt-BR')
+                data: new Date().toISOString()
 
             })
 
@@ -2118,7 +2113,7 @@ function criarPedido(){
         // STATUS
         // =========================
 
-        let statusInicial = "recebido";
+        let statusInicial = "preparo";
 
         // pedidos do iFood entram finalizados
         if(
@@ -2152,7 +2147,7 @@ function criarPedido(){
 
             tipoVenda,
 
-            data: new Date(),
+            data: new Date().toISOString(),
 
             status: statusInicial,
 
@@ -2228,31 +2223,21 @@ function atualizarTela(){
         // TEXTO DO STATUS
         let textoStatus = "";
 
-        if(p.status === "recebido"){
-            textoStatus = "🟡 Recebido";
-        }
-        else if(p.status === "preparo"){
-            textoStatus = "🟠 Em preparo";
-        }
-        else if(p.status === "entrega"){
-            textoStatus = "🔵 Saiu entrega";
-        }
-        else{
-            textoStatus = "🟢 Finalizado";
-        }
+        if(p.status === "preparo"){
+    textoStatus = "🟠 Em preparo";
+}
+else{
+    textoStatus = "🟢 Finalizado";
+}
 
         // TEXTO DO BOTÃO
         let textoBotao = "";
 
-        if(p.status === "recebido"){
-            textoBotao = "🟠 Iniciar preparo";
-        }
-        else if(p.status === "preparo"){
-            textoBotao = "🔵 Saiu entrega";
-        }
-        else if(p.status === "entrega"){
-            textoBotao = "🟢 Finalizar";
-        }
+        if(p.status === "preparo"){
+
+    textoBotao = "🟢 Finalizar Pedido";
+
+}
 
         let card = `
         <div class="pedido ${p.status} novo">
@@ -2279,7 +2264,7 @@ function atualizarTela(){
         ">
 
             🕒 ${
-                new Date(p.data).toLocaleTimeString(
+                new Date(String(p.data)).toLocaleTimeString(
                     'pt-BR',
                     {
                         hour:'2-digit',
@@ -2410,16 +2395,16 @@ Taxa: R$ ${Number(p.taxa || 0).toFixed(2)}
         `;
 
         // separação das colunas
-        if(
-            p.status === "recebido" ||
-            p.status === "preparo" ||
-            p.status === "entrega"
-        ){
-            preparoHTML += card;
-        }
-        else{
-            prontoHTML += card;
-        }
+        if(p.status === "preparo"){
+
+    preparoHTML += card;
+
+}
+else{
+
+    prontoHTML += card;
+
+}
 
     });
 
@@ -2615,34 +2600,65 @@ function mudarStatus(numero){
 
     if(!pedido) return;
 
-    // RECEBIDO -> PREPARO
-    if(pedido.status === "recebido"){
+    // PREPARO -> FINALIZADO
+    if(pedido.status === "preparo"){
 
-        pedido.status = "preparo";
-
-    }
-
-    // PREPARO -> ENTREGA
-    else if(pedido.status === "preparo"){
+        pedido.status = "finalizado";
 
         pedido.tempoFinal =
             tempoDecorrido(pedido);
 
-        pedido.status = "entrega";
-
     }
 
-    // ENTREGA -> FINALIZADO
-    else if(pedido.status === "entrega"){
-
-        pedido.status = "finalizado";
-
-    }
+    atualizarStatusPlanilha(
+        pedido.numero,
+        pedido.status,
+        pedido.tempoFinal
+    );
 
     salvar();
 
     atualizarTela();
-        atualizarDashboard();
+
+    atualizarDashboard();
+
+}
+
+async function atualizarStatusPlanilha(
+    numero,
+    status,
+    tempoFinal
+){
+
+    try{
+
+        await fetch(API_URL, {
+
+            method: "POST",
+
+            body: JSON.stringify({
+
+                acao: "atualizarStatus",
+
+                numero: numero,
+
+                status: status,
+
+                tempoFinal: tempoFinal
+
+            })
+
+        });
+
+    }
+    catch(err){
+
+        console.log(
+            "Erro atualizar status:",
+            err
+        );
+
+    }
 
 }
 
