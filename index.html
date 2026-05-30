@@ -1530,11 +1530,15 @@ R$ <span id="totalDia">0.00</span>
 <script>
 
 const API_URL =
-"https://script.google.com/macros/s/AKfycbx1QEY1fgd6VIKB9x7dV8N37puNBMERO3oHsihrZcIJ5ICNhCxAJXHObCYWmeSNZdo/exec";
+"https://script.google.com/macros/s/AKfycbzQFNw249hOQplBAt4WzlGdaOev5E1KYgn2bRWhC2z-7eotL51OmToVydzAqQXzsilT/exec";
 
 let senhaAdmin = "";
+
 let produtosLoja = [];
+
 let produtosIfood = [];
+
+let sincronizando = false;
 
 function buscarProduto(nome, tipoVenda){
 
@@ -1602,13 +1606,7 @@ function receberProdutos(dados){
         pedidos = pedidosAPI;
 
         contador =
-            pedidos.length
-            ? Math.max(
-                ...pedidos.map(
-                    p => Number(p.numero)
-                )
-            ) + 1
-            : 1;
+    Number(dados.ultimoNumero || 0) + 1;
 
         atualizarTela();
 
@@ -1627,9 +1625,13 @@ carregarProdutos();
 
 setInterval(() => {
 
-    carregarProdutos();
+    if(!sincronizando){
 
-}, 1000);
+        carregarProdutos();
+
+    }
+
+}, 3000);
 
 let pedidos = [];
 
@@ -2591,7 +2593,7 @@ function toggleCategoria(id){
 }
 
 /* STATUS */
-function mudarStatus(numero){
+async function mudarStatus(numero){
 
     let pedido =
         pedidos.find(
@@ -2600,27 +2602,45 @@ function mudarStatus(numero){
 
     if(!pedido) return;
 
-    // PREPARO -> FINALIZADO
-    if(pedido.status === "preparo"){
+    sincronizando = true;
 
-        pedido.status = "finalizado";
+    try{
 
-        pedido.tempoFinal =
-            tempoDecorrido(pedido);
+        if(pedido.status === "preparo"){
+
+            pedido.status = "finalizado";
+
+            pedido.tempoFinal =
+                tempoDecorrido(pedido);
+
+        }
+
+        atualizarTela();
+
+        atualizarDashboard();
+
+        await atualizarStatusPlanilha(
+
+            pedido.numero,
+            pedido.status,
+            pedido.tempoFinal
+
+        );
+
+        await carregarProdutos();
+
+    }
+    catch(err){
+
+        console.log(err);
+
+        alert(
+            "Erro ao atualizar pedido"
+        );
 
     }
 
-    atualizarStatusPlanilha(
-        pedido.numero,
-        pedido.status,
-        pedido.tempoFinal
-    );
-
-    salvar();
-
-    atualizarTela();
-
-    atualizarDashboard();
+    sincronizando = false;
 
 }
 
@@ -2630,32 +2650,38 @@ async function atualizarStatusPlanilha(
     tempoFinal
 ){
 
-    try{
+    console.log(
+        "Atualizando",
+        numero,
+        status
+    );
 
-        await fetch(API_URL, {
+    const resposta = await fetch(API_URL, {
 
-            method: "POST",
+        method:"POST",
 
-            body: JSON.stringify({
+        body:JSON.stringify({
 
-                acao: "atualizarStatus",
+            acao:"atualizarStatus",
 
-                numero: numero,
+            numero:numero,
 
-                status: status,
+            status:status,
 
-                tempoFinal: tempoFinal
+            tempoFinal:tempoFinal
 
-            })
+        })
 
-        });
+    });
 
-    }
-    catch(err){
+    const json = await resposta.json();
 
-        console.log(
-            "Erro atualizar status:",
-            err
+    console.log("Resposta:", json);
+
+    if(!json.sucesso){
+
+        throw new Error(
+            "Falha ao atualizar status"
         );
 
     }
@@ -2664,32 +2690,26 @@ async function atualizarStatusPlanilha(
 
 async function excluirPedidoPlanilha(numero){
 
-    try{
+    const resposta = await fetch(API_URL, {
 
-        await fetch(API_URL, {
+        method: "POST",
 
-            method: "POST",
+        body: JSON.stringify({
 
-            body: JSON.stringify({
+            acao: "excluir",
 
-                acao: "excluir",
+            numero: numero
 
-                numero: numero
+        })
 
-            })
+    });
 
-        });
+    const json = await resposta.json();
 
-        console.log(
-            "Pedido removido da planilha"
-        );
+    if(!json.sucesso){
 
-    }
-    catch(err){
-
-        console.log(
-            "Erro ao excluir:",
-            err
+        throw new Error(
+            "Falha ao excluir pedido"
         );
 
     }
@@ -2697,19 +2717,37 @@ async function excluirPedidoPlanilha(numero){
 }
 
 /* EXCLUIR */
-function excluirPedido(numero){
+async function excluirPedido(numero){
 
-    pedidos =
-        pedidos.filter(
-            p => p.numero !== numero
+    sincronizando = true;
+
+    try{
+
+        await excluirPedidoPlanilha(numero);
+
+        pedidos =
+            pedidos.filter(
+                p => p.numero !== numero
+            );
+
+        atualizarTela();
+
+        atualizarDashboard();
+
+        await carregarProdutos();
+
+    }
+    catch(err){
+
+        console.log(err);
+
+        alert(
+            "Erro ao excluir pedido"
         );
 
-excluirPedidoPlanilha(numero);
+    }
 
-    salvar();
-
-    atualizarTela();
-        atualizarDashboard();
+    sincronizando = false;
 
 }
 
