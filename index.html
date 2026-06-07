@@ -1349,7 +1349,8 @@ label{
 <!-- BOTÕES -->
 <div class="acoes">
 
-<button class="btn"
+<button id="btnCriarPedido"
+        class="btn"
         onclick="criarPedido()">
 
 CRIAR PEDIDO
@@ -1601,12 +1602,12 @@ function receberProdutos(dados){
         JSON.stringify(pedidos);
 
     // SÓ ATUALIZA SE MUDAR
+
+    contador = Number(dados.ultimoNumero || 0) + 1;
+
     if(mudou){
 
         pedidos = pedidosAPI;
-
-        contador =
-    Number(dados.ultimoNumero || 0) + 1;
 
         atualizarTela();
 
@@ -1618,6 +1619,8 @@ function receberProdutos(dados){
     document
         .getElementById("loading")
         .classList.add("esconder");
+
+document.getElementById("btnCriarPedido").disabled = false;
 
 }
 
@@ -1635,10 +1638,7 @@ setInterval(() => {
 
 let pedidos = [];
 
-let contador =
-    pedidos.length
-    ? Math.max(...pedidos.map(p => p.numero)) + 1
-    : 1;
+let contador = null;
 
 /* SALVAR */
 function salvar(){
@@ -1887,6 +1887,14 @@ console.log("ENVIANDO PARA PLANILHA", pedido);
 /* CRIAR PEDIDO */
 
 function criarPedido(){
+
+if (contador === null) {
+
+    alert("Aguarde o carregamento completo do sistema.");
+
+    return;
+
+}
 
     try{
 
@@ -2867,7 +2875,9 @@ setTimeout(() => {
 
 /* INICIAR */
 atualizarTela();
-        atualizarDashboard();
+atualizarDashboard();
+
+document.getElementById("btnCriarPedido").disabled = true;
 
 setInterval(() => {
 
