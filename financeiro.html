@@ -114,7 +114,7 @@ canvas{margin-top:20px;}
 // CONFIG
 // =========================
 
-const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS76g6HmO0IRXE6BfU4o7KMER9fkRbJqb8FPljS29yNIB2k2Sa-Hn9yJ5O9WBRAC0-gCk1_ANSbL4tC/pub?gid=0&single=true&output=csv";
+const URL = "https://script.google.com/macros/s/AKfycbzQFNw249hOQplBAt4WzlGdaOev5E1KYgn2bRWhC2z-7eotL51OmToVydzAqQXzsilT/exec";
 
 let pedidos = [];
 let financeiro = {};
@@ -157,42 +157,27 @@ return new Date(str);
 // CSV
 // =========================
 
-async function loadCSV(){
-try{
-const res = await fetch(URL);
-const text = await res.text();
-parseCSV(text);
-render();
-}catch(e){
-console.log("erro CSV",e);
-}
+async function loadData(){
+  try{
+    const res = await fetch(URL);
+    const data = await res.json();
+
+    // 🔥 AQUI está a diferença importante
+    parseAPI(data.pedidos);
+
+    render();
+
+  }catch(e){
+    console.log("erro API", e);
+  }
 }
 
-function parseCSV(text){
+function parseAPI(data){
 
 pedidos = [];
 financeiro = {};
 
-let linhas = text.trim().split("\n");
-linhas.shift(); // remove cabeçalho
-
-for(let l of linhas){
-
-let col = l.includes(";") ? l.split(";") : l.split(",");
-
-// 🔥 MAPEAMENTO CORRETO DA SUA PLANILHA
-let pedido = {
-numero: col[0],
-cliente: col[1],
-itens: col[2],
-subtotal: Number(col[3]) || 0,
-taxa: Number(col[4]) || 0,
-lucro: Number(col[5]) || 0,
-total: Number(col[6]) || 0,        // ✅ TOTAL REAL
-tipo: col[7] || "",                // Loja / iFood / etc
-status: col[8] || "",
-data: col[9] || ""                 // ✅ DATA REAL
-};
+for(let pedido of data){
 
 if(!pedido.data) continue;
 
@@ -213,14 +198,11 @@ total:0
 };
 }
 
-financeiro[k].total += pedido.total;
+financeiro[k].total += Number(pedido.total) || 0;
 financeiro[k].pedidos++;
+financeiro[k].dinheiro += Number(pedido.total) || 0;
 
-// Como sua planilha NÃO tem forma de pagamento real:
-financeiro[k].dinheiro += pedido.total;
 }
-
-console.log("OK FINANCEIRO:", financeiro);
 }
 
 // =========================
@@ -348,7 +330,7 @@ drawCalendar();render();
 // =========================
 
 drawCalendar();
-loadCSV();
+loadData();
 
 </script>
 
