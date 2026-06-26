@@ -2790,48 +2790,17 @@ function fecharPainelPedidos(){
 
 function abrirDashboard(){
 
-    let painel =
-        document.getElementById(
-            "painelFinanceiro"
-        );
+    let senha = prompt("Digite a senha do dashboard:");
 
-    let overlay =
-        document.getElementById(
-            "overlayFinanceiro"
-        );
+    if(senha === null) return;
 
-    // SE JÁ ESTIVER ABERTO → FECHA
-    if(
-        painel.classList.contains("aberto")
-    ){
-
-        fecharFinanceiro();
-        return;
-
-    }
-
-    // SENHA
-    let senha =
-        prompt("Digite a senha do dashboard:");
-
-    if(
-        senha === null
-    ) return;
-
-    if(
-        senha.trim() !==
-        senhaAdmin.toString().trim()
-    ){
-
+    if(senha.trim() !== senhaAdmin.toString().trim()){
         alert("Senha incorreta");
         return;
-
     }
 
-    painel.classList.add("aberto");
-
-    overlay.classList.add("ativo");
-
+    // abre outra página
+    window.location.href = "financeiro.html";
 }
 
 function fecharFinanceiro(){
