@@ -2790,17 +2790,36 @@ function fecharPainelPedidos(){
 
 function abrirDashboard(){
 
-    let senha = prompt("Digite a senha do dashboard:");
+    let painel = document.getElementById("painelFinanceiro");
+    let overlay = document.getElementById("overlayFinanceiro");
 
-    if(senha === null) return;
+    if(painel.classList.contains("aberto")){
+        fecharFinanceiro();
+        return;
+    }
+
+    // abre modal de senha
+    document.getElementById("modalSenhaBox").style.display = "flex";
+    document.getElementById("inputSenha").value = "";
+}
+
+function confirmarSenha(){
+
+    let senha = document.getElementById("inputSenha").value;
 
     if(senha.trim() !== senhaAdmin.toString().trim()){
         alert("Senha incorreta");
         return;
     }
 
-    // abre outra página
+    fecharModalSenha();
+
+    // abre a página financeiro
     window.location.href = "financeiro.html";
+}
+
+function fecharModalSenha(){
+    document.getElementById("modalSenhaBox").style.display = "none";
 }
 
 function fecharFinanceiro(){
@@ -2856,5 +2875,29 @@ setInterval(() => {
 
 </script>
 
+<div id="modalSenhaBox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:99999; align-items:center; justify-content:center;">
+
+  <div style="background:white; padding:20px; border-radius:12px; width:90%; max-width:320px; text-align:center;">
+
+    <h3>🔒 Acesso Financeiro</h3>
+
+    <input id="inputSenha" type="password" placeholder="Digite a senha"
+      style="width:100%; padding:12px; margin-top:12px; border:1px solid #ccc; border-radius:8px;">
+
+    <div style="display:flex; gap:10px; margin-top:15px;">
+
+      <button onclick="confirmarSenha()" style="flex:1; padding:10px; background:#7b2cbf; color:white; border:none; border-radius:8px;">
+        Entrar
+      </button>
+
+      <button onclick="fecharModalSenha()" style="flex:1; padding:10px; background:#dc2626; color:white; border:none; border-radius:8px;">
+        Cancelar
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 </body>
 </html>
