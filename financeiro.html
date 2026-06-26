@@ -174,21 +174,24 @@ pedidos = [];
 financeiro = {};
 
 let linhas = text.trim().split("\n");
-let header = linhas.shift().split(",");
-
-// pega índice dinamicamente
-let idxTotal = header.indexOf("total");
-let idxTipo = header.indexOf("tipo");
-let idxData = header.indexOf("data");
+linhas.shift(); // remove cabeçalho
 
 for(let l of linhas){
 
 let col = l.includes(";") ? l.split(";") : l.split(",");
 
+// 🔥 MAPEAMENTO CORRETO DA SUA PLANILHA
 let pedido = {
-total: Number(col[idxTotal]) || 0,
-tipo: col[idxTipo] || "",
-data: col[idxData] || ""
+numero: col[0],
+cliente: col[1],
+itens: col[2],
+subtotal: Number(col[3]) || 0,
+taxa: Number(col[4]) || 0,
+lucro: Number(col[5]) || 0,
+total: Number(col[6]) || 0,        // ✅ TOTAL REAL
+tipo: col[7] || "",                // Loja / iFood / etc
+status: col[8] || "",
+data: col[9] || ""                 // ✅ DATA REAL
 };
 
 if(!pedido.data) continue;
@@ -201,21 +204,23 @@ if(!d) continue;
 let k = key(d.getFullYear(), d.getMonth()+1, d.getDate());
 
 if(!financeiro[k]){
-financeiro[k] = {pix:0,cartao:0,dinheiro:0,pedidos:0,total:0};
+financeiro[k] = {
+pix:0,
+cartao:0,
+dinheiro:0,
+pedidos:0,
+total:0
+};
 }
 
 financeiro[k].total += pedido.total;
 financeiro[k].pedidos++;
 
-let t = pedido.tipo.toLowerCase();
-
-if(t.includes("pix")) financeiro[k].pix += pedido.total;
-else if(t.includes("cart")) financeiro[k].cartao += pedido.total;
-else financeiro[k].dinheiro += pedido.total;
-
+// Como sua planilha NÃO tem forma de pagamento real:
+financeiro[k].dinheiro += pedido.total;
 }
 
-console.log("FINANCEIRO:", financeiro);
+console.log("OK FINANCEIRO:", financeiro);
 }
 
 // =========================
