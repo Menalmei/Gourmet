@@ -7,7 +7,7 @@
 
   <title>Menalmei Delivery</title>
 
-  <link rel="stylesheet" href="./Style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -73,6 +73,11 @@
               onclick="abrirAba('fechamento',this)">
         Fechamento semanal
       </button>
+
+<button class="nav-button admin-only"
+        onclick="abrirAba('gerenciar',this)">
+  Gerenciar entregadores
+</button>
     </nav>
 
     <section id="inicio" class="tab-content">
@@ -193,13 +198,87 @@
 
     </section>
 
+<section id="gerenciar" class="tab-content hidden">
+
+  <div class="section-title">
+    <h2>Gerenciar entregadores</h2>
+    <p>Cadastre e administre sua equipe de entregas.</p>
+  </div>
+
+  <div class="panel">
+
+    <h2>Adicionar entregador</h2>
+
+    <form id="courierForm">
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Nome do entregador</label>
+          <input id="novoEntregadorNome" required
+                 placeholder="Ex: João Silva">
+        </div>
+
+        <div class="field">
+          <label>Nome de usuário</label>
+          <input id="novoEntregadorUsuario" required
+                 placeholder="Ex: joao">
+        </div>
+
+        <div class="field">
+          <label>Senha de acesso</label>
+          <input id="novoEntregadorSenha" type="password"
+                 minlength="6" required
+                 placeholder="Mínimo de 6 caracteres">
+        </div>
+
+        <div class="field">
+          <label>Veículo</label>
+          <select id="novoEntregadorVeiculo" required>
+            <option value="Moto">Moto</option>
+            <option value="Bicicleta">Bicicleta</option>
+            <option value="Carro">Carro</option>
+            <option value="Variável">Variável</option>
+          </select>
+        </div>
+
+<div class="field">
+  <label>Telefone / WhatsApp</label>
+  <input
+    id="novoEntregadorTelefone"
+    type="tel"
+    required
+    placeholder="Ex: (13) 99999-9999">
+</div>
+
+      </div>
+
+      <button type="submit" class="primary-button">
+        Adicionar entregador
+      </button>
+
+    </form>
+
+  </div>
+
+  <div class="section-title">
+    <h2>Equipe cadastrada</h2>
+  </div>
+
+  <div id="courierManagementList" class="delivery-list">
+    <div class="loading">Carregando equipe...</div>
+  </div>
+
+</section>
+
+
   </main>
 
   <footer>
     MENALMEI DELIVERY • Sistema de logística
   </footer>
 
-  <script src="./JavaScript.js"></script>
+  <script src="javascript.js"></script>
 
 </body>
 </html>

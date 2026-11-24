@@ -9,6 +9,7 @@ let TOKEN = sessionStorage.getItem('menalmei_token') || '';
 let USUARIO = null;
 let ENTREGADORES = [];
 let intervaloAtualizacao = null;
+let TODOS_ENTREGADORES = [];
 
 const $ = id => document.getElementById(id);
 
@@ -210,9 +211,14 @@ async function prepararPainel() {
   const admin = USUARIO.perfil === 'admin';
 
   document.querySelectorAll('.navigation button')
-    .forEach((botao,i)=>{
-      if (!admin && i===2) botao.style.display='none';
-    });
+  .forEach((botao,i)=>{
+    if (!admin && i===2) botao.style.display='none';
+  });
+
+document.querySelectorAll('.admin-only')
+  .forEach(botao => {
+    botao.style.display = admin ? '' : 'none';
+  });
 
   if (!admin) {
     document.querySelectorAll('.navigation button')[1]
@@ -232,12 +238,18 @@ async function prepararPainel() {
 
   $('veiculo').addEventListener('change',calcularTaxa);
 
+$('courierForm').addEventListener(
+  'submit',
+  salvarNovoEntregador
+);
+
   if (!admin) {
     $('entregas').querySelector('.panel').style.display='none';
   }
 
   await carregarEntregadores();
   await atualizarPainel();
+  if (nome==='gerenciar') carregarGerenciamento();
 
   iniciarAtualizacaoAutomatica();
 }
@@ -266,6 +278,7 @@ function calcularTaxa() {
    NAVEGAÇÃO
 ========================================== */
 
+
 function abrirAba(nome,botao) {
   document.querySelectorAll('.tab-content')
     .forEach(el=>el.classList.add('hidden'));
@@ -280,7 +293,9 @@ function abrirAba(nome,botao) {
   if (nome==='inicio') atualizarPainel();
   if (nome==='entregas') carregarEntregas();
   if (nome==='fechamento') carregarFechamento();
+  if (nome==='gerenciar') carregarGerenciamento();
 }
+
 
 /* ==========================================
    CADASTRO DE ENTREGA
@@ -349,6 +364,7 @@ async function carregarEntregas() {
       );
 
       const nome = entregador ? entregador.nome : 'Entregador';
+      const telefone = entregador ? entregador.telefone : '';
 
       const statusClass =
         e.status==='Entregue'?'done':
@@ -414,9 +430,10 @@ async function carregarEntregas() {
             <button onclick="window.open('${mapa}','_blank')">
               Abrir mapa
             </button>
-            <button onclick="compartilharWhatsApp('${encodeURIComponent(mensagem)}')">
-              WhatsApp
+            <button onclick="compartilharWhatsApp('${telefone}','${encodeURIComponent(mensagem)}')">
+            Whatsapp
             </button>
+             
           </div>
         </article>
       `;
@@ -441,12 +458,30 @@ async function alterarStatus(id,status) {
   }
 }
 
-function compartilharWhatsApp(mensagem) {
+
+function compartilharWhatsApp(telefone, mensagem) {
+  telefone = String(telefone || '').replace(/\D/g, '');
+
+  if (!telefone) {
+    aviso('Este entregador ainda não possui telefone cadastrado.');
+    return;
+  }
+
+  if (telefone.length === 10 || telefone.length === 11) {
+    telefone = '55' + telefone;
+  }
+
+  if (!/^55\d{10,11}$/.test(telefone)) {
+    aviso('O telefone do entregador é inválido.');
+    return;
+  }
+
   window.open(
-    'https://wa.me/?text='+mensagem,
+    'https://wa.me/' + telefone + '?text=' + mensagem,
     '_blank'
   );
 }
+
 
 /* ==========================================
    PAINEL PRINCIPAL
@@ -624,6 +659,199 @@ function iniciarAtualizacaoAutomatica() {
 }
 
 
+async function carregarGerenciamento() {
+  try {
+    TODOS_ENTREGADORES = await chamarServidor(
+      'apiListarTodosEntregadores',
+      TOKEN
+    );
+
+    const lista = $('courierManagementList');
+
+    if (!TODOS_ENTREGADORES.length) {
+      lista.innerHTML = '<div class="loading">Nenhum entregador cadastrado.</div>';
+      return;
+    }
+
+    lista.innerHTML = TODOS_ENTREGADORES.map(e => `
+      <article class="delivery-card">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+
+          <div>
+            <h3>${escapar(e.nome)}</h3>
+            <p>Usuário: ${escapar(e.usuario)}</p>
+            <p>Veículo: ${escapar(e.veiculo)}</p>
+	    <p>WhatsApp: ${escapar(e.telefone || 'Não informado')}</p>
+	    <p>ID: ${escapar(e.id)}</p>
+          </div>
+
+          <strong style="color:${e.ativo ? '#23864b' : '#b83232'}">
+            ${e.ativo ? 'ATIVO' : 'INATIVO'}
+          </strong>
+
+        </div>
+
+        <div class="actions" style="margin-top:15px">
+
+          <button onclick="editarEntregador('${escapar(e.id)}')">
+            Editar
+          </button>
+
+          <button
+            style="background:${e.ativo ? '#b83232' : '#23864b'};color:white"
+            onclick="alterarStatusEntregador('${escapar(e.id)}',${!e.ativo})">
+
+            ${e.ativo ? 'Desativar' : 'Ativar'}
+
+          </button>
+<button
+  style="background:#8b2525;color:white"
+  onclick="excluirEntregador('${escapar(e.id)}')">
+
+  Excluir
+
+</button>
+
+        </div>
+
+      </article>
+    `).join('');
+
+  } catch(e) {
+    aviso(e.message);
+  }
+}
+
+
+// CADASTRAR
+async function salvarNovoEntregador(evento) {
+  evento.preventDefault();
+
+  const botao = $('courierForm').querySelector(
+    'button[type="submit"]'
+  );
+
+  botao.disabled = true;
+  botao.textContent = 'Cadastrando...';
+
+  const dados = {
+    nome: $('novoEntregadorNome').value,
+    usuario: $('novoEntregadorUsuario').value,
+    senha: $('novoEntregadorSenha').value,
+    veiculo: $('novoEntregadorVeiculo').value,
+    telefone: $('novoEntregadorTelefone').value
+  };
+
+  try {
+    await chamarServidor(
+      'apiCriarEntregador',
+      TOKEN,
+      dados
+    );
+
+    aviso('Entregador cadastrado com sucesso!');
+
+    $('courierForm').reset();
+
+    await carregarGerenciamento();
+    await carregarEntregadores();
+    await atualizarPainel();
+
+  } catch(e) {
+    aviso(e.message);
+
+  } finally {
+    botao.disabled = false;
+    botao.textContent = 'Adicionar entregador';
+  }
+}
+
+
+// EDITAR
+
+async function editarEntregador(id) {
+  const entregador = TODOS_ENTREGADORES.find(
+    e => e.id === id
+  );
+
+  if (!entregador) return;
+
+  const nome = prompt(
+    'Nome do entregador:',
+    entregador.nome
+  );
+
+  if (nome === null) return;
+
+  const veiculo = prompt(
+    'Veículo do entregador:',
+    entregador.veiculo
+  );
+
+  if (veiculo === null) return;
+
+  const telefone = prompt(
+    'Telefone / WhatsApp com DDD:',
+    entregador.telefone || ''
+  );
+
+  if (telefone === null) return;
+
+  try {
+    await chamarServidor(
+      'apiEditarEntregador',
+      TOKEN,
+      id,
+      nome,
+      veiculo,
+      telefone
+    );
+
+    aviso('Cadastro atualizado com sucesso!');
+
+    await carregarGerenciamento();
+    await carregarEntregadores();
+    await atualizarPainel();
+
+  } catch(e) {
+    aviso(e.message);
+  }
+}
+
+
+
+// ATIVAR OU DESATIVAR
+async function alterarStatusEntregador(id, ativo) {
+  const mensagem = ativo
+    ? 'Deseja reativar este entregador?'
+    : 'Deseja desativar este entregador?';
+
+  if (!confirm(mensagem)) return;
+
+  try {
+    await chamarServidor(
+      'apiAlterarStatusEntregador',
+      TOKEN,
+      id,
+      ativo
+    );
+
+    aviso(
+      ativo
+        ? 'Entregador ativado!'
+        : 'Entregador desativado!'
+    );
+
+    await carregarGerenciamento();
+    await carregarEntregadores();
+    await atualizarPainel();
+
+  } catch(e) {
+    aviso(e.message);
+  }
+}
+
 /* ==========================================
    INÍCIO
 ========================================== */
@@ -649,4 +877,40 @@ window.addEventListener('load',async()=>{
     controlarTela(false);
   }
 });
+
+
+async function excluirEntregador(id) {
+
+  const entregador = TODOS_ENTREGADORES.find(
+    e => e.id === id
+  );
+
+  if (!entregador) return;
+
+  const confirmar = confirm(
+    'ATENÇÃO!\n\n' +
+    'Deseja excluir definitivamente ' +
+    entregador.nome + '?\n\n' +
+    'Essa ação não poderá ser desfeita.'
+  );
+
+  if (!confirmar) return;
+
+  try {
+    await chamarServidor(
+      'apiExcluirEntregador',
+      TOKEN,
+      id
+    );
+
+    aviso('Entregador excluído com sucesso!');
+
+    await carregarGerenciamento();
+    await carregarEntregadores();
+    await atualizarPainel();
+
+  } catch(e) {
+    aviso(e.message);
+  }
+}
 
