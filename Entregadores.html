@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Menalmei Delivery</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="logo">
+      MENALMEI <span>DELIVERY</span>
+      <small>CENTRAL DE LOGÍSTICA</small>
+    </div>
+
+    <div class="system-status">
+      <span class="status-dot"></span>
+      Sistema conectado
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="welcome">
+      <div>
+        <h1>Central de entregas</h1>
+        <p>Gerencie os pedidos e acompanhe seus entregadores.</p>
+      </div>
+      <div class="date" id="currentDate"></div>
+    </section>
+
+    <section class="stats">
+
+      <div class="stat-card">
+        <span>Entregas</span>
+        <strong id="totalEntregas">0</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Aguardando</span>
+        <strong id="aguardando">0</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Em rota</span>
+        <strong id="emRota">0</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Taxas acumuladas</span>
+        <strong id="totalTaxas">R$ 0,00</strong>
+      </div>
+
+    </section>
+
+    <nav class="navigation">
+      <button class="nav-button active"
+              onclick="abrirAba('inicio',this)">
+        Visão geral
+      </button>
+
+      <button class="nav-button"
+              onclick="abrirAba('entregas',this)">
+        Entregas
+      </button>
+
+      <button class="nav-button"
+              onclick="abrirAba('fechamento',this)">
+        Fechamento semanal
+      </button>
+    </nav>
+
+    <section id="inicio" class="tab-content">
+
+      <div class="section-title">
+        <h2>Seus entregadores</h2>
+      </div>
+
+      <div class="courier-grid" id="courierGrid">
+        <div class="loading">Carregando entregadores...</div>
+      </div>
+
+    </section>
+
+    <section id="entregas" class="tab-content hidden">
+
+      <div class="section-title">
+        <h2>Nova entrega</h2>
+      </div>
+
+      <div class="panel">
+
+        <form id="deliveryForm">
+
+          <div class="form-grid">
+
+            <div class="field">
+              <label>Nome do cliente</label>
+              <input id="cliente" required>
+            </div>
+
+            <div class="field">
+              <label>Origem do pedido</label>
+              <select id="origem">
+                <option>WhatsApp</option>
+                <option>iFood</option>
+                <option>99Food</option>
+                <option>Outro</option>
+              </select>
+            </div>
+
+            <div class="field full">
+              <label>Endereço completo</label>
+              <input id="endereco" required>
+            </div>
+
+            <div class="field full">
+              <label>Referência / localização</label>
+              <input id="referencia">
+            </div>
+
+            <div class="field">
+              <label>Entregador</label>
+              <select id="entregador"></select>
+            </div>
+
+            <div class="field">
+              <label>Veículo</label>
+              <select id="veiculo">
+                <option value="Bicicleta">Bicicleta</option>
+                <option value="Moto">Moto</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Taxa de entrega (R$)</label>
+              <input id="taxa" type="number"
+                     min="0" step="0.50" required>
+            </div>
+
+            <div class="field">
+              <label>Observações</label>
+              <input id="observacao">
+            </div>
+
+          </div>
+
+          <button type="submit" class="primary-button">
+            Cadastrar entrega
+          </button>
+
+        </form>
+
+      </div>
+
+      <div class="section-title">
+        <h2>Pedidos cadastrados</h2>
+      </div>
+
+      <div id="deliveryList" class="delivery-list">
+        <div class="loading">Carregando...</div>
+      </div>
+
+    </section>
+
+    <section id="fechamento" class="tab-content hidden">
+
+      <div class="panel">
+        <h2>Fechamento semanal</h2>
+
+        <p>
+          Período de segunda-feira até domingo.
+          Pagamento previsto para quarta-feira.
+        </p>
+
+        <div class="field">
+          <label>Escolher data da semana</label>
+          <input type="date" id="dataSemana">
+        </div>
+
+        <button class="primary-button"
+                onclick="carregarFechamento()">
+          Consultar fechamento
+        </button>
+
+        <div id="fechamentoResultado"></div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer>
+    MENALMEI DELIVERY • Sistema de logística
+  </footer>
+
+  <script src="javascript.js"></script>
+
+</body>
+</html>
