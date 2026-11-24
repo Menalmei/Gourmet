@@ -238,6 +238,16 @@ document.querySelectorAll('.admin-only')
 
   $('veiculo').addEventListener('change',calcularTaxa);
 
+$('alterarSenhaForm').addEventListener(
+  'submit',
+  alterarMinhaSenha
+);
+
+$('redefinirSenhaForm').addEventListener(
+  'submit',
+  redefinirSenhaEntregador
+);
+
 $('courierForm').addEventListener(
   'submit',
   salvarNovoEntregador
@@ -294,6 +304,7 @@ function abrirAba(nome,botao) {
   if (nome==='entregas') carregarEntregas();
   if (nome==='fechamento') carregarFechamento();
   if (nome==='gerenciar') carregarGerenciamento();
+  if (nome==='configuracoes') carregarConfiguracoes();
 }
 
 
@@ -908,6 +919,117 @@ async function excluirEntregador(id) {
     await carregarGerenciamento();
     await carregarEntregadores();
     await atualizarPainel();
+
+  } catch(e) {
+    aviso(e.message);
+  }
+}
+
+
+async function carregarConfiguracoes() {
+  try {
+    TODOS_ENTREGADORES = await chamarServidor(
+      'apiListarTodosEntregadores',
+      TOKEN
+    );
+
+    const select = $('entregadorSenha');
+
+    select.innerHTML =
+      '<option value="">Selecione um entregador</option>';
+
+    TODOS_ENTREGADORES.forEach(e => {
+      const option = document.createElement('option');
+
+      option.value = e.id;
+      option.textContent =
+        e.nome + (e.ativo ? ' (Ativo)' : ' (Inativo)');
+
+      select.appendChild(option);
+    });
+
+  } catch(e) {
+    aviso(e.message);
+  }
+}
+
+
+// ALTERAR MINHA SENHA
+async function alterarMinhaSenha(evento) {
+  evento.preventDefault();
+
+  const atual = $('senhaAtual').value;
+  const nova = $('novaSenha').value;
+  const confirmar = $('confirmarNovaSenha').value;
+
+  if (nova !== confirmar) {
+    aviso('As novas senhas não coincidem.');
+    return;
+  }
+
+  if (nova.length < 6) {
+    aviso('A nova senha deve ter pelo menos 6 caracteres.');
+    return;
+  }
+
+  try {
+    await chamarServidor(
+      'apiAlterarMinhaSenha',
+      TOKEN,
+      atual,
+      nova
+    );
+
+    $('alterarSenhaForm').reset();
+
+    aviso('Sua senha foi alterada com sucesso!');
+
+  } catch(e) {
+    aviso(e.message);
+  }
+}
+
+
+// REDEFINIR SENHA DO ENTREGADOR
+async function redefinirSenhaEntregador(evento) {
+  evento.preventDefault();
+
+  const id = $('entregadorSenha').value;
+  const nova = $('senhaEntregador').value;
+  const confirmar = $('confirmarSenhaEntregador').value;
+
+  if (!id) {
+    aviso('Selecione um entregador.');
+    return;
+  }
+
+  if (nova !== confirmar) {
+    aviso('As novas senhas não coincidem.');
+    return;
+  }
+
+  if (nova.length < 6) {
+    aviso('A senha deve ter pelo menos 6 caracteres.');
+    return;
+  }
+
+  if (!confirm(
+    'Deseja realmente redefinir a senha deste entregador?'
+  )) {
+    return;
+  }
+
+  try {
+    await chamarServidor(
+      'apiRedefinirSenhaEntregador',
+      TOKEN,
+      id,
+      nova
+    );
+
+    $('redefinirSenhaForm').reset();
+
+    aviso('Senha do entregador redefinida com sucesso!');
 
   } catch(e) {
     aviso(e.message);

@@ -78,6 +78,11 @@
         onclick="abrirAba('gerenciar',this)">
   Gerenciar entregadores
 </button>
+
+<button class="nav-button admin-only"
+        onclick="abrirAba('configuracoes',this)">
+  Configurações
+</button>
     </nav>
 
     <section id="inicio" class="tab-content">
@@ -267,6 +272,93 @@
 
   <div id="courierManagementList" class="delivery-list">
     <div class="loading">Carregando equipe...</div>
+  </div>
+
+</section>
+
+
+<section id="configuracoes" class="tab-content hidden">
+
+  <div class="section-title">
+    <h2>Configurações de acesso</h2>
+    <p>Gerencie suas senhas e os acessos da equipe.</p>
+  </div>
+
+  <div class="panel">
+
+    <h2>Alterar minha senha</h2>
+
+    <form id="alterarSenhaForm">
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Senha atual</label>
+          <input id="senhaAtual" type="password"
+                 required autocomplete="current-password">
+        </div>
+
+        <div class="field">
+          <label>Nova senha</label>
+          <input id="novaSenha" type="password"
+                 minlength="6" required
+                 autocomplete="new-password">
+        </div>
+
+        <div class="field">
+          <label>Confirmar nova senha</label>
+          <input id="confirmarNovaSenha" type="password"
+                 minlength="6" required
+                 autocomplete="new-password">
+        </div>
+
+      </div>
+
+      <button type="submit" class="primary-button">
+        Alterar minha senha
+      </button>
+
+    </form>
+
+  </div>
+
+  <div class="panel">
+
+    <h2>Redefinir senha de entregador</h2>
+
+    <form id="redefinirSenhaForm">
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Selecionar entregador</label>
+          <select id="entregadorSenha" required>
+            <option value="">Carregando equipe...</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Nova senha do entregador</label>
+          <input id="senhaEntregador" type="password"
+                 minlength="6" required
+                 autocomplete="new-password">
+        </div>
+
+        <div class="field">
+          <label>Confirmar nova senha</label>
+          <input id="confirmarSenhaEntregador" type="password"
+                 minlength="6" required
+                 autocomplete="new-password">
+        </div>
+
+      </div>
+
+      <button type="submit" class="primary-button">
+        Redefinir senha
+      </button>
+
+    </form>
+
   </div>
 
 </section>
