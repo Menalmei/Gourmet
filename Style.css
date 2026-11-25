@@ -260,37 +260,183 @@ footer {
   color: var(--muted);
 }
 
-@media(max-width:700px) {
+@media (max-width: 700px) {
+
+  /* Estrutura geral */
+  .container {
+    margin: 18px auto;
+    padding: 0 14px;
+  }
+
+  /* Menu principal */
+  .navigation {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 25px;
+  }
+
+  .nav-button {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 8px;
+    font-size: 13px;
+    line-height: 1.3;
+    border-radius: 10px;
+  }
+
+  /* Indicadores */
   .stats {
     grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
 
+  .stat-card {
+    padding: 14px;
+  }
+
+  .stat-card strong {
+    font-size: 20px;
+  }
+
+  /* Entregadores */
   .courier-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
+  /* Formulários */
   .form-grid {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
 
   .full {
     grid-column: auto;
   }
 
+  .field {
+    margin-bottom: 15px;
+  }
+
+  input,
+  select {
+    min-height: 46px;
+    font-size: 16px;
+  }
+
+  /* Botões principais */
+  button {
+    min-height: 44px;
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+
+  .primary-button {
+    width: 100%;
+    min-height: 48px;
+    margin-top: 10px;
+  }
+
+  /* Categorias: Aguardando, Em rota e Concluídos */
+  #btnAguardando,
+  #btnRota,
+  #btnConcluidos {
+    flex: 1 1 28%;
+    min-width: 0;
+    min-height: 48px;
+    padding: 10px 5px;
+    font-size: 12px;
+    line-height: 1.3;
+    border-radius: 10px;
+  }
+
+  /* Cartões das entregas */
+  .delivery-list {
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .delivery-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .delivery-card h3 {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .delivery-card p {
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+  }
+
+  /* Botões dentro dos cartões */
+  .delivery-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .delivery-actions button {
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 8px;
+    font-size: 12px;
+    line-height: 1.3;
+    border-radius: 9px;
+    white-space: normal;
+  }
+
+  /* Cabeçalhos e painéis */
+  .section-title {
+    margin: 24px 0 15px;
+  }
+
+  .section-title h2,
+  .panel h2 {
+    font-size: 17px;
+  }
+
+  .panel {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  /* Cabeçalho */
+  .topbar {
+    padding: 16px;
+    gap: 10px;
+  }
+
+  .logo {
+    font-size: 17px;
+  }
+
+  .system-status {
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  /* Boas-vindas */
   .welcome {
     align-items: flex-start;
     flex-direction: column;
+    gap: 8px;
   }
 
-  .topbar {
-    padding: 16px;
+  .welcome h1 {
+    font-size: 22px;
   }
 
-  .container {
-    margin-top: 20px;
+  .welcome p {
+    line-height: 1.5;
   }
 
-  .stat-card strong {
-    font-size: 21px;
+  footer {
+    padding: 22px 12px;
   }
 }
