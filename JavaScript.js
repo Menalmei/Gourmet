@@ -10,6 +10,7 @@ let USUARIO = null;
 let ENTREGADORES = [];
 let intervaloAtualizacao = null;
 let TODOS_ENTREGADORES = [];
+let categoriaEntregaAtiva = 'aguardando';
 
 const $ = id => document.getElementById(id);
 
@@ -259,7 +260,6 @@ $('courierForm').addEventListener(
 
   await carregarEntregadores();
   await atualizarPainel();
-  if (nome==='gerenciar') carregarGerenciamento();
 
   iniciarAtualizacaoAutomatica();
 }
@@ -322,15 +322,16 @@ async function salvarEntrega(evento) {
   botao.textContent = 'Salvando...';
 
   const dados = {
-    cliente:$('cliente').value,
-    origem:$('origem').value,
-    endereco:$('endereco').value,
-    referencia:$('referencia').value,
-    entregadorID:$('entregador').value,
-    veiculo:$('veiculo').value,
-    taxa:$('taxa').value,
-    observacao:$('observacao').value
-  };
+  cliente:$('cliente').value,
+  origem:$('origem').value,
+  localizador:$('localizador').value,
+  endereco:$('endereco').value,
+  referencia:$('referencia').value,
+  entregadorID:$('entregador').value,
+  veiculo:$('veiculo').value,
+  taxa:$('taxa').value,
+  observacao:$('observacao').value
+};
 
   try {
     await chamarServidor('apiCriarEntrega',TOKEN,dados);
@@ -355,6 +356,7 @@ async function salvarEntrega(evento) {
    LISTA DE ENTREGAS
 ========================================== */
 
+
 async function carregarEntregas() {
   try {
     const entregas = await chamarServidor(
@@ -363,13 +365,58 @@ async function carregarEntregas() {
 
     const lista = $('deliveryList');
 
-    if (!entregas.length) {
-      lista.innerHTML =
-        '<div class="loading">Nenhuma entrega cadastrada.</div>';
-      return;
-    }
+const quantidadeAguardando = entregas.filter(
+  e => e.status === 'Aguardando'
+).length;
 
-    lista.innerHTML = entregas.map(e=>{
+const quantidadeRota = entregas.filter(
+  e => e.status === 'Saiu para entrega'
+).length;
+
+const quantidadeConcluidos = entregas.filter(
+  e => e.status === 'Entregue'
+).length;
+
+$('btnAguardando').textContent =
+  `Aguardando (${quantidadeAguardando})`;
+
+$('btnRota').textContent =
+  `Em rota (${quantidadeRota})`;
+
+$('btnConcluidos').textContent =
+  `Concluídos (${quantidadeConcluidos})`;
+
+const entregasFiltradas = entregas.filter(e => {
+
+  if (categoriaEntregaAtiva === 'aguardando') {
+    return e.status === 'Aguardando';
+  }
+
+  if (categoriaEntregaAtiva === 'rota') {
+    return e.status === 'Saiu para entrega';
+  }
+
+  if (categoriaEntregaAtiva === 'concluidos') {
+    return e.status === 'Entregue';
+  }
+
+  return false;
+});
+
+if (!entregasFiltradas.length) {
+  const mensagens = {
+    aguardando: 'Nenhum pedido aguardando.',
+    rota: 'Nenhum pedido em rota.',
+    concluidos: 'Nenhum pedido concluído.'
+  };
+
+  lista.innerHTML =
+    `<div class="loading">${mensagens[categoriaEntregaAtiva]}</div>`;
+
+  return;
+}
+
+    lista.innerHTML = entregasFiltradas.map(e=>{
       const entregador = ENTREGADORES.find(
         x=>x.id===e.entregadorID
       );
@@ -382,35 +429,34 @@ async function carregarEntregas() {
         e.status==='Saiu para entrega'?'out':'waiting';
 
       let botoes = '';
-      
+
       if (USUARIO.perfil === 'admin') {
-  botoes += `
-    <button
-      onclick="excluirEntrega('${escapar(e.id)}')"
-      style="background:#b83232;color:white">
-      Excluir pedido
-    </button>
-  `;
-}
+        botoes += `
+          <button
+            onclick="excluirEntrega('${escapar(e.id)}')"
+            style="background:#b83232;color:white">
+            Excluir pedido
+          </button>
+        `;
+      }
 
       if (e.status==='Aguardando') {
-        botoes += `
-          <button onclick="alterarStatus('${escapar(e.id)}','Saiu para entrega')">
-            Saiu para entrega
-          </button>`;
-      }
+  botoes += `
+    <button
+      onclick="alterarStatus('${escapar(e.id)}','Saiu para entrega')"
+      style="background:#E67E22;color:white">
+      Saiu para entrega
+    </button>`;
+}
 
       if (e.status!=='Entregue') {
-        botoes += `
-          <button onclick="alterarStatus('${escapar(e.id)}','Entregue')">
-            Marcar entregue
-          </button>`;
-      } else {
-        botoes += `
-          <button onclick="alterarStatus('${escapar(e.id)}','Saiu para entrega')">
-            Reabrir
-          </button>`;
-      }
+  botoes += `
+    <button
+      onclick="alterarStatus('${escapar(e.id)}','Entregue')"
+      style="background:#2e7d32;color:white">
+      Marcar entregue
+    </button>`;
+}
 
       const mapa = 'https://www.google.com/maps/search/?api=1&query='+
         encodeURIComponent(e.endereco);
@@ -418,8 +464,22 @@ async function carregarEntregas() {
       const mensagem =
         `MENALMEI DELIVERY\nCliente: ${e.cliente}\nEndereço: ${e.endereco}\nReferência: ${e.referencia || '-'}\nTaxa: ${moeda(e.taxa)}`;
 
+      const botaoLocalizador = e.localizador ? `
+  <button
+    onclick="copiarLocalizador('${encodeURIComponent(e.localizador)}')"
+    style="background:#6A1B9A;color:white">
+    Copiar Localizador
+  </button>
+` : '';
+
       return `
-        <article class="delivery-card">
+        <article class="delivery-card" style="
+  border-left:5px solid ${
+    e.status === 'Aguardando' ? '#E67E22' :
+    e.status === 'Saiu para entrega' ? '#1565C0' :
+    '#2E7D32'
+  };
+">
           <div style="display:flex;justify-content:space-between;gap:10px">
             <div>
               <h3>${escapar(e.cliente)}</h3>
@@ -436,15 +496,33 @@ async function carregarEntregas() {
             ${escapar(e.origem)} • ${escapar(nome)} • ${escapar(e.veiculo)}
           </p>
 
+          ${e.localizador ? `
+            <p>
+              <strong>Localizador:</strong>
+              ${escapar(e.localizador)}
+            </p>
+          ` : ''}
+
+${e.observacao ? `
+  <p style="color:#c62828;font-weight:bold;">
+    <strong>Observação:</strong>
+    ${escapar(e.observacao)}
+  </p>
+` : ''}
+
           <div class="actions">
+            ${botaoLocalizador}
+            ${botaoConfirmacao(e.origem)}
             ${botoes}
-            <button onclick="window.open('${mapa}','_blank')">
-              Abrir mapa
-            </button>
-            <button onclick="compartilharWhatsApp('${telefone}','${encodeURIComponent(mensagem)}')">
+            <button
+  		onclick="window.open('${mapa}','_blank')"
+  		style="background:#1976d2;color:white">
+  		Abrir mapa
+            ${USUARIO.perfil === 'admin' ? `
+  	    <button onclick="compartilharWhatsApp('${telefone}','${encodeURIComponent(mensagem)}')">
             Whatsapp
             </button>
-             
+            ` : ''}
           </div>
         </article>
       `;
@@ -454,6 +532,7 @@ async function carregarEntregas() {
     aviso(e.message);
   }
 }
+
 
 async function alterarStatus(id,status) {
   try {
@@ -1036,3 +1115,178 @@ async function redefinirSenhaEntregador(evento) {
   }
 }
 
+
+async function consultarHistorico() {
+  const dataConsulta = $('dataHistorico').value;
+  const lista = $('historicoList');
+
+  if (!dataConsulta) {
+    aviso('Selecione uma data para consultar.');
+    return;
+  }
+
+  lista.innerHTML = '<div class="loading">Consultando histórico...</div>';
+
+  try {
+    const entregas = await chamarServidor(
+      'apiConsultarHistoricoEntregas',
+      TOKEN,
+      dataConsulta
+    );
+
+    if (!entregas.length) {
+      lista.innerHTML =
+        '<div class="loading">Nenhuma entrega encontrada nesta data.</div>';
+      return;
+    }
+
+    lista.innerHTML = entregas.map(e => {
+      const entregador = ENTREGADORES.find(
+        x => x.id === e.entregadorID
+      );
+
+      const nomeEntregador = entregador
+        ? entregador.nome
+        : 'Entregador';
+
+      const statusClass =
+        e.status === 'Entregue' ? 'done' :
+        e.status === 'Saiu para entrega' ? 'out' :
+        'waiting';
+
+      const mapa =
+        'https://www.google.com/maps/search/?api=1&query=' +
+        encodeURIComponent(e.endereco);
+
+      const mensagem =
+        `MENALMEI DELIVERY\n` +
+        `Cliente: ${e.cliente}\n` +
+        `Endereço: ${e.endereco}\n` +
+        `Referência: ${e.referencia || '-'}\n` +
+        `Taxa: ${moeda(e.taxa)}`;
+
+      const telefone = entregador
+        ? entregador.telefone
+        : '';
+
+      const botaoLocalizador = e.localizador ? `
+  <button
+    onclick="copiarLocalizador('${encodeURIComponent(e.localizador)}')"
+    style="background:#6A1B9A;color:white">
+    Copiar Localizador
+  </button>
+` : '';
+
+      return `
+        <article class="delivery-card">
+
+          <div class="delivery-header">
+            <div>
+              <strong>${escapar(e.cliente)}</strong>
+              <div>${escapar(e.hora)}</div>
+            </div>
+
+            <span class="status ${statusClass}">
+              ${escapar(e.status)}
+            </span>
+          </div>
+
+          <div class="delivery-details">
+            <p><strong>Origem:</strong> ${escapar(e.origem)}</p>
+            ${e.localizador ? `<p><strong>Localizador:</strong> ${escapar(e.localizador)}</p>` : ''}
+            <p><strong>Endereço:</strong> ${escapar(e.endereco)}</p>
+            <p><strong>Referência:</strong> ${escapar(e.referencia || '-')}</p>
+            <p><strong>Entregador:</strong> ${escapar(nomeEntregador)}</p>
+            <p><strong>Veículo:</strong> ${escapar(e.veiculo)}</p>
+            <p><strong>Taxa:</strong> ${moeda(e.taxa)}</p>
+            <p><strong>Observação:</strong> ${escapar(e.observacao || '-')}</p>
+          </div>
+
+          <div class="delivery-actions">
+
+            ${botaoLocalizador}
+            ${botaoConfirmacao(e.origem)}
+
+            <button onclick="window.open('${mapa}','_blank')">
+              Abrir mapa
+            </button>
+
+            <button onclick="compartilharWhatsApp('${telefone}','${encodeURIComponent(mensagem)}')">
+              WhatsApp
+            </button>
+
+          </div>
+
+        </article>
+      `;
+    }).join('');
+
+  } catch (e) {
+    lista.innerHTML = '';
+    aviso(e.message);
+  }
+}
+
+
+async function copiarLocalizador(codigo) {
+  try {
+    const localizador = decodeURIComponent(codigo);
+
+    await navigator.clipboard.writeText(localizador);
+
+    aviso('Localizador copiado!');
+  } catch(e) {
+    aviso('Não foi possível copiar o localizador.');
+  }
+}
+
+function botaoConfirmacao(origem) {
+  if (origem === 'iFood') {
+    return `
+      <button
+        onclick="window.open('https://confirmacao-entrega-propria.ifood.com.br/numero-pedido','_blank')"
+        style="background:#d32f2f;color:white">
+        Confirmar iFood
+      </button>
+    `;
+  }
+
+  if (origem === '99Food') {
+    return `
+      <button
+        onclick="window.open('https://food-b-h5.99app.com/pt-BR/v2/confirmation-entrega','_blank')"
+        style="background:#fbc02d;color:#222">
+        Confirmar 99Food
+      </button>
+    `;
+  }
+
+  return '';
+}
+
+function abrirCategoriaEntrega(categoria) {
+
+  categoriaEntregaAtiva = categoria;
+
+  const botoes = {
+    aguardando: $('btnAguardando'),
+    rota: $('btnRota'),
+    concluidos: $('btnConcluidos')
+  };
+
+  const cores = {
+    aguardando: '#E67E22',
+    rota: '#1565C0',
+    concluidos: '#2E7D32'
+  };
+
+  Object.keys(botoes).forEach(chave => {
+    botoes[chave].style.opacity =
+      chave === categoria ? '1' : '0.55';
+
+    botoes[chave].style.transform =
+      chave === categoria ? 'scale(1.03)' : 'scale(1)';
+  });
+
+  carregarEntregas();
+}

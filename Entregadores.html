@@ -7,7 +7,7 @@
 
   <title>Menalmei Delivery</title>
 
-  <link rel="stylesheet" href="Style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -124,6 +124,12 @@
               </select>
             </div>
 
+	<div class="field">
+  		<label>Localizador do pedido</label>
+  		<input id="localizador"
+         		placeholder="Código do pedido na plataforma">
+	</div>
+
             <div class="field full">
               <label>Endereço completo</label>
               <input id="endereco" required>
@@ -169,12 +175,66 @@
       </div>
 
       <div class="section-title">
-        <h2>Pedidos cadastrados</h2>
+  <h2>Pedidos cadastrados</h2>
+</div>
+
+<div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+
+  <button type="button"
+          onclick="abrirCategoriaEntrega('aguardando')"
+          id="btnAguardando"
+          style="background:#E67E22;color:white">
+    Aguardando
+  </button>
+
+  <button type="button"
+          onclick="abrirCategoriaEntrega('rota')"
+          id="btnRota"
+          style="background:#1565C0;color:white">
+    Em rota
+  </button>
+
+  <button type="button"
+          onclick="abrirCategoriaEntrega('concluidos')"
+          id="btnConcluidos"
+          style="background:#2E7D32;color:white">
+    Concluídos
+  </button>
+
+</div>
+
+<div id="deliveryList" class="delivery-list">
+  <div class="loading">Carregando...</div>
+</div>
+
+
+      <div class="panel" style="margin-top:25px">
+
+        <h2>Histórico de entregas</h2>
+
+        <p>Consulte as entregas de qualquer dia anterior.</p>
+
+        <div class="form-grid">
+
+          <div class="field">
+            <label>Data para consulta</label>
+            <input type="date" id="dataHistorico">
+          </div>
+
+        </div>
+
+        <button type="button"
+                class="primary-button"
+                onclick="consultarHistorico()">
+          Consultar histórico
+        </button>
+
+        <div id="historicoList" class="delivery-list"
+             style="margin-top:20px">
+        </div>
+
       </div>
 
-      <div id="deliveryList" class="delivery-list">
-        <div class="loading">Carregando...</div>
-      </div>
 
     </section>
 
@@ -370,7 +430,7 @@
     MENALMEI DELIVERY • Sistema de logística
   </footer>
 
-  <script src="JavaScript.js"></script>
+  <script src="javascript.js"></script>
 
 </body>
 </html>
