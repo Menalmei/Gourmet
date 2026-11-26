@@ -5,7 +5,7 @@ const API_URL =
  * MENALMEI DELIVERY - INTERFACE
  ****************************************************/
 
-let TOKEN = sessionStorage.getItem('menalmei_token') || '';
+let TOKEN = localStorage.getItem('menalmei_token') || '';
 let USUARIO = null;
 let ENTREGADORES = [];
 let intervaloAtualizacao = null;
@@ -161,7 +161,7 @@ async function fazerLogin(evento) {
     TOKEN = resultado.token;
     USUARIO = resultado.usuario;
 
-    sessionStorage.setItem('menalmei_token',TOKEN);
+    localStorage.setItem('menalmei_token',TOKEN);
 
     controlarTela(true);
     prepararPainel();
@@ -173,6 +173,7 @@ async function fazerLogin(evento) {
   }
 }
 
+
 async function sair() {
   try {
     await chamarServidor('apiSair',TOKEN);
@@ -181,9 +182,10 @@ async function sair() {
   TOKEN = '';
   USUARIO = null;
 
-  sessionStorage.removeItem('menalmei_token');
+  localStorage.removeItem('menalmei_token');
   location.reload();
 }
+
 
 /* ==========================================
    INICIALIZAÇÃO DA INTERFACE
@@ -967,12 +969,17 @@ async function alterarStatusEntregador(id, ativo) {
 ========================================== */
 
 
-window.addEventListener('load',async()=>{
-  criarTelaLogin();
 
-  if (!TOKEN) return;
+window.addEventListener('load',async()=>{
+
+  if (!TOKEN) {
+    criarTelaLogin();
+    controlarTela(false);
+    return;
+  }
 
   try {
+
     USUARIO = await chamarServidor(
       'apiValidarSessao',TOKEN
     );
@@ -981,11 +988,17 @@ window.addEventListener('load',async()=>{
     prepararPainel();
 
   } catch(e) {
+
     TOKEN = '';
     USUARIO = null;
-    sessionStorage.removeItem('menalmei_token');
+
+    localStorage.removeItem('menalmei_token');
+
+    criarTelaLogin();
     controlarTela(false);
+
   }
+
 });
 
 
