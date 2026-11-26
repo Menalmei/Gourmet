@@ -85,6 +85,52 @@
 </button>
     </nav>
 
+<!-- NAVEGAÇÃO MOBILE -->
+<nav class="mobile-navigation">
+
+  <button class="mobile-nav-button active"
+          onclick="abrirAba('inicio',this)"
+          data-aba="inicio">
+    <span class="mobile-nav-icon">⌂</span>
+    <span>Início</span>
+  </button>
+
+  <button class="mobile-nav-button"
+          onclick="abrirAba('entregas',this)"
+          data-aba="entregas">
+    <span class="mobile-nav-icon">▣</span>
+    <span>Entregas</span>
+  </button>
+
+  <button class="mobile-nav-button"
+          onclick="abrirAba('fechamento',this)"
+          data-aba="fechamento">
+    <span class="mobile-nav-icon">▤</span>
+    <span>Fechamento</span>
+  </button>
+
+  <button class="mobile-nav-button admin-only"
+        onclick="alternarMenuMais()">
+    <span class="mobile-nav-icon">☰</span>
+    <span>Mais</span>
+  </button>
+
+</nav>
+
+<div id="menuMaisMobile" class="menu-mais-mobile hidden">
+
+  <button class="mobile-more-button admin-only"
+          onclick="abrirAba('gerenciar',this)">
+    Gerenciar entregadores
+  </button>
+
+  <button class="mobile-more-button admin-only"
+          onclick="abrirAba('configuracoes',this)">
+    Configurações
+  </button>
+
+</div>
+
     <section id="inicio" class="tab-content">
 
       <div class="section-title">

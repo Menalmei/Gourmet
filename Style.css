@@ -457,3 +457,108 @@ footer {
     padding: 22px 12px;
   }
 }
+
+/* NAVEGAÇÃO MOBILE - MENALMEI DELIVERY */
+
+.mobile-navigation,
+.menu-mais-mobile {
+  display: none;
+}
+
+@media (max-width: 700px) {
+
+  /* Esconde o menu original no celular */
+  .navigation {
+    display: none !important;
+  }
+
+  /* Barra inferior */
+  .mobile-navigation {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+
+    background: #ffffff;
+    border-top: 1px solid #eae5df;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.08);
+
+    justify-content: space-around;
+    align-items: center;
+
+    padding: 8px 5px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  }
+
+  /* Botões da barra */
+  .mobile-nav-button {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 4px;
+    min-height: 58px;
+    padding: 6px 4px;
+
+    background: transparent;
+    color: #887f78;
+
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+  }
+
+  /* Ícones */
+  .mobile-nav-icon {
+    font-size: 23px;
+    line-height: 1;
+  }
+
+  /* Aba ativa */
+  .mobile-nav-button.active {
+    color: #765087;
+    background: #eee7f1;
+  }
+
+  /* Menu Mais */
+  .menu-mais-mobile {
+    position: fixed;
+    bottom: calc(82px + env(safe-area-inset-bottom));
+    right: 12px;
+
+    width: 220px;
+    z-index: 10000;
+
+    background: white;
+    border: 1px solid #eae5df;
+    border-radius: 14px;
+    padding: 10px;
+
+    box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+  }
+
+  .menu-mais-mobile:not(.hidden) {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mobile-more-button {
+    width: 100%;
+    text-align: left;
+    padding: 14px;
+    background: #eee7f1;
+    color: #765087;
+    border-radius: 10px;
+  }
+
+  /* Evita conteúdo escondido atrás da barra */
+  body {
+    padding-bottom: 100px;
+  }
+
+}

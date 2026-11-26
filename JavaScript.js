@@ -290,6 +290,7 @@ function calcularTaxa() {
 
 
 function abrirAba(nome,botao) {
+
   document.querySelectorAll('.tab-content')
     .forEach(el=>el.classList.add('hidden'));
 
@@ -298,7 +299,26 @@ function abrirAba(nome,botao) {
   document.querySelectorAll('.nav-button')
     .forEach(el=>el.classList.remove('active'));
 
-  botao.classList.add('active');
+  document.querySelectorAll('.mobile-nav-button')
+    .forEach(el=>el.classList.remove('active'));
+
+  if (botao) {
+    botao.classList.add('active');
+  }
+
+  const botaoMobile = document.querySelector(
+    `.mobile-nav-button[data-aba="${nome}"]`
+  );
+
+  if (botaoMobile) {
+    botaoMobile.classList.add('active');
+  }
+
+  const menuMais = $('menuMaisMobile');
+
+  if (menuMais) {
+    menuMais.classList.add('hidden');
+  }
 
   if (nome==='inicio') atualizarPainel();
   if (nome==='entregas') carregarEntregas();
@@ -1289,4 +1309,14 @@ function abrirCategoriaEntrega(categoria) {
   });
 
   carregarEntregas();
+}
+
+function alternarMenuMais() {
+
+  const menu = $('menuMaisMobile');
+
+  if (!menu) return;
+
+  menu.classList.toggle('hidden');
+
 }
