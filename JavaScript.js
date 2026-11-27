@@ -532,19 +532,26 @@ ${e.observacao ? `
   </p>
 ` : ''}
 
-          <div class="actions">
+                    <div class="actions">
+
             ${botaoLocalizador}
             ${botaoConfirmacao(e.origem)}
             ${botoes}
+
             <button
-  		onclick="window.open('${mapa}','_blank')"
-  		style="background:#1976d2;color:white">
-  		Abrir mapa
-            ${USUARIO.perfil === 'admin' ? `
-  	    <button onclick="compartilharWhatsApp('${telefone}','${encodeURIComponent(mensagem)}')">
-            Whatsapp
+              onclick="window.open('${mapa}','_blank')"
+              style="background:#1976d2;color:white">
+              Abrir mapa
             </button>
+
+            ${USUARIO.perfil === 'admin' ? `
+              <button
+                onclick="compartilharWhatsApp('${telefone}','${encodeURIComponent(mensagem)}')"
+                style="background:#278052;color:white">
+                WhatsApp
+              </button>
             ` : ''}
+
           </div>
         </article>
       `;
@@ -712,14 +719,8 @@ async function marcarPagamento(id,pago) {
 }
 
 
+
 async function excluirEntrega(id) {
-  const confirmar = confirm(
-    'Tem certeza que deseja excluir este pedido?\n\n' +
-    'Essa ação não poderá ser desfeita.'
-  );
-
-  if (!confirmar) return;
-
   try {
     await chamarServidor('apiExcluirEntrega', TOKEN, id);
 
@@ -732,6 +733,7 @@ async function excluirEntrega(id) {
     aviso(e.message);
   }
 }
+
 
 
 function iniciarAtualizacaoAutomatica() {
