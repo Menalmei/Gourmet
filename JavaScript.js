@@ -450,35 +450,42 @@ if (!entregasFiltradas.length) {
         e.status==='Entregue'?'done':
         e.status==='Saiu para entrega'?'out':'waiting';
 
-      let botoes = '';
+      
+let botoes = '';
 
-      if (USUARIO.perfil === 'admin') {
-        botoes += `
-          <button
-            onclick="excluirEntrega('${escapar(e.id)}')"
-            style="background:#b83232;color:white">
-            Excluir pedido
-          </button>
-        `;
-      }
+// ADMIN: pode excluir em qualquer status
+if (USUARIO.perfil === 'admin') {
+  botoes += `
+    <button
+      onclick="excluirEntrega('${escapar(e.id)}')"
+      style="background:#b83232;color:white">
+      Excluir pedido
+    </button>
+  `;
+}
 
-      if (e.status==='Aguardando') {
+// PEDIDO AGUARDANDO
+if (e.status === 'Aguardando') {
   botoes += `
     <button
       onclick="alterarStatus('${escapar(e.id)}','Saiu para entrega')"
       style="background:#E67E22;color:white">
       Saiu para entrega
-    </button>`;
+    </button>
+  `;
 }
 
-      if (e.status!=='Entregue') {
+// PEDIDO EM ROTA
+if (e.status === 'Saiu para entrega') {
   botoes += `
     <button
       onclick="alterarStatus('${escapar(e.id)}','Entregue')"
       style="background:#2e7d32;color:white">
       Marcar entregue
-    </button>`;
+    </button>
+  `;
 }
+
 
       const mapa = 'https://www.google.com/maps/search/?api=1&query='+
         encodeURIComponent(e.endereco);
@@ -534,9 +541,22 @@ ${e.observacao ? `
 
                     <div class="actions">
 
-            ${botaoLocalizador}
-            ${botaoConfirmacao(e.origem)}
-            ${botoes}
+            
+${e.status === 'Aguardando' ? `
+  ${botoes}
+` : e.status === 'Saiu para entrega' ? `
+  ${botaoLocalizador}
+  ${botaoConfirmacao(e.origem)}
+  ${botoes}
+  ${USUARIO.perfil === 'admin' ? `
+    <button
+      onclick="compartilharWhatsApp('${telefone}','${encodeURIComponent(mensagem)}')"
+      style="background:#278052;color:white">
+      WhatsApp
+    </button>
+  ` : ''}
+` : ''}
+
 
             <button
               onclick="window.open('${mapa}','_blank')"
